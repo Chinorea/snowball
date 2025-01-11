@@ -26,7 +26,7 @@ export const SocialLogin = () => {
           }
           console.log(user);
           createData(event, email, "Google");
-          //router.push("/Dashboard");
+          router.push("/Dashboard");
         }).catch((error) => {
           // Handle Errors here.
           const errorCode = error.code;
