@@ -73,7 +73,7 @@ export const SignUpPage = () => {
           await signInWithEmailAndPassword(auth,email,password)
           .then((userCredential)=>{
               const user = userCredential.user;
-              router.push("/Dashboard"); // Navigate to the dashboard   
+              router.push("/Voucher"); // Navigate to the dashboard   
           })
           } catch (err){
               console.error(err);
