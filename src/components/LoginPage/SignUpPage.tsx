@@ -3,41 +3,82 @@ import "./index.css"
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { useState } from "react";
-import { collection, addDoc, setDoc, doc } from "firebase/firestore";
+import { collection, getDoc, setDoc, doc, addDoc } from "firebase/firestore";
+import { sign } from "node:crypto";
 
+
+export const createData = async (event: React.MouseEvent<HTMLButtonElement>, email: string, method: string) => {
+  event.preventDefault(); // Prevent form submission
+  const userRef = doc(db, "users", email);
+  try {
+    await setDoc(userRef, {
+      usertype: "User",
+      name: email,
+      loginMethod: method
+    }, {merge: true});
+    console.log("Document successfully written!");
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
+
+export const createNestedData = async (event: React.MouseEvent<HTMLButtonElement>, email: string, method: string) => {
+  event.preventDefault(); // Prevent form submission
+
+  //Method to get Specific Document reference path. Same path to be used for extracting nested data.
+  //All collection document must be in even numbers, any Odd number will result in an error.
+  const userRef = doc(db, "users", email);
+  const dataRef = doc(userRef, "NestedCollection", "dataID");
+  try {
+    await setDoc(dataRef, {
+      usertype: "User",
+      name: email,
+      loginMethod: method
+    }, {merge: true});
+    console.log("Document successfully written!");
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
+
+export const getData = async (event: React.MouseEvent<HTMLButtonElement>, email: string) => {
+  event.preventDefault(); // Prevent form submission
+  const docRef = doc(db, "users", email);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    //Retrival of data by data.{KeyName}
+    const userType = data.usertype;
+    const name = data.name;
+    const loginMethod = data.loginMethod;
+
+    // Log the extracted data
+    console.log("User Type:", userType);
+    console.log("Name:", name);
+    console.log("Login Method:", loginMethod);
+  } else {
+    // doc.data() will be undefined in this case
+    console.log("No such document!");
+  }
+};
 
 export const SignUpPage = () => {
     const router = useRouter(); // Initialize the router
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const createData = async (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault(); // Prevent form submission
-      // try {
-      //   const docRef = await addDoc(collection(db, email), {
-      //     first: "Ada",
-      //     last: "Lovelace",
-      //     born: 1815
-      //   });
-      //   console.log("Document written with ID: ", docRef.id);
-      // } catch (e) {
-      //   console.error("Error adding document: ", e);
-      // }
-      const userRef = doc(db, "users", email)
-      try {
-        const docRef = await setDoc(userRef,{
-          first: "Ada",
-          last: "Lovelace",
-          born: 1815
-        });
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
-  };
-
-    const logIn = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const logIn = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault(); // Prevent form submission
-        router.push("/Voucher"); // Navigate to the dashboard
+        try{
+          await signInWithEmailAndPassword(auth,email,password)
+          .then((userCredential)=>{
+              const user = userCredential.user;
+              router.push("/Dashboard"); // Navigate to the dashboard   
+          })
+          } catch (err){
+              console.error(err);
+              alert(err);
+          }
     };
 
       const signUp = async(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,7 +87,8 @@ export const SignUpPage = () => {
           await createUserWithEmailAndPassword(auth,email,password)
           .then((userCredential)=>{
               const user = userCredential.user;
-              alert("Signed up successfully!");
+              createData(event, email, "Email");
+              alert("Signed up successfully!");   
           })
           } catch (err){
               console.error(err);
@@ -54,6 +96,12 @@ export const SignUpPage = () => {
           }
         
       };
+
+      const testGetData = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault(); // Prevent form submission
+        getData(event, email);
+      };
+
   
     return(
         <div>
@@ -86,11 +134,12 @@ export const SignUpPage = () => {
                 </div>
                 <a href="#" className="forgot-password-link">Forgot password?</a>
             </div>
+            {/* Login Button */}
             <button
-              onClick={createData}
+              onClick={testGetData}
               className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded"
             >
-              Create Data
+              getData
             </button>
             {/* Login Button */}
             <button

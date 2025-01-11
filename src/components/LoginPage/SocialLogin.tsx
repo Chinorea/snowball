@@ -2,6 +2,7 @@ import "./index.css"
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth, provider } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
+import { createData } from "./SignUpPage";
 
 
 export const SocialLogin = () => {
@@ -19,7 +20,12 @@ export const SocialLogin = () => {
           const token = credential.accessToken;
           // The signed-in user info.
           const user = result.user;
+          const email = user.email
+          if(email == null){
+            return;
+          }
           console.log(user);
+          createData(event, email, "Google");
           router.push("/Dashboard");
         }).catch((error) => {
           // Handle Errors here.
@@ -32,12 +38,6 @@ export const SocialLogin = () => {
           console.log(errorCode, errorMessage, email, credential);
         });
     }
-
-    const appleLogIn = async(event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault(); // Prevent form submission
-        alert("Apple");
-    }
-
 
     return(
         <div>
