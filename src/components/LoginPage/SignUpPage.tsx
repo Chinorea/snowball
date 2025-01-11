@@ -1,13 +1,34 @@
 import { useRouter } from "next/navigation";
 import "./index.css"
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
+import { useState } from "react";
 
 export const SignUpPage = () => {
     const router = useRouter(); // Initialize the router
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
 
     const logIn = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault(); // Prevent form submission
         router.push("/Dashboard"); // Navigate to the dashboard
     };
+
+      const signUp = async(event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault(); // Prevent form submission
+        try{
+          await createUserWithEmailAndPassword(auth,email,password)
+          .then((userCredential)=>{
+              const user = userCredential.user;
+              alert("Signed up successfully!");
+          })
+          } catch (err){
+              console.error(err);
+              alert(err);
+          }
+        
+      };
   
     return(
         <div>
@@ -21,6 +42,7 @@ export const SignUpPage = () => {
                     id="username"
                     className="bg-gray-200 dark:bg-gray-700 dark:text-white rounded pl-12 py-2 md:py-4 focus:outline-none w-full"
                     placeholder="Email Address"
+                    onChange={(ev)=>setEmail(ev.target.value)}
                 />
             </div>
             {/* Password Input */}
@@ -34,6 +56,7 @@ export const SignUpPage = () => {
                     id="password"
                     className="bg-gray-200 dark:bg-gray-700 dark:text-white rounded pl-12 py-2 md:py-4 focus:outline-none w-full"
                     placeholder="Password"
+                    onChange={(ev)=>setPassword(ev.target.value)}
                 />
                 </div>
                 <a href="#" className="forgot-password-link">Forgot password?</a>
@@ -47,6 +70,7 @@ export const SignUpPage = () => {
             </button>
             {/* Signup Button */}
             <button
+              onClick={signUp}
               className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded mt-4"
             >
               Sign Up
