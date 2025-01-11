@@ -49,11 +49,6 @@ export const SocialLogin = () => {
                 <img src="/img/google.svg" alt="Google" className="social-icon" />
                 Google
                 </button>
-                <button className="social-button"
-                onClick={appleLogIn}>
-                <img src="/img/apple.svg" alt="Apple" className="social-icon" />
-                Apple
-                </button>
             </div>
         </div>
     );
