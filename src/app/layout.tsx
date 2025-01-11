@@ -16,11 +16,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class">
+        {/* <ThemeProvider attribute="class" defaultTheme="dark" > */}
           {/* Dynamic background based on the route */}
           {/* <div className={isHomePage ? "bg-indigo-200 dark:bg-purple-800 min-h-screen w-full" : "bg-white min-h-screen w-full"}> */}
             {/* <Navbar /> */}
@@ -28,7 +27,7 @@ export default function RootLayout({
             {/* <Footer /> */}
             {/* <PopupWidget /> */}
           {/* </div> */}
-        </ThemeProvider>
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );
