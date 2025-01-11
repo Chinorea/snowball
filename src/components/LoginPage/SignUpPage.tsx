@@ -6,34 +6,26 @@ import { useState } from "react";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 
 
+export const createData = async (event: React.MouseEvent<HTMLButtonElement>, email: string, method: string) => {
+  event.preventDefault(); // Prevent form submission
+  const userRef = doc(db, "users", email);
+
+  try {
+    await setDoc(userRef, {
+      usertype: "User",
+      name: email,
+      loginMethod: method
+    }, {merge: true});
+    console.log("Document successfully written!");
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
+
 export const SignUpPage = () => {
     const router = useRouter(); // Initialize the router
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    const createData = async (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault(); // Prevent form submission
-      // try {
-      //   const docRef = await addDoc(collection(db, email), {
-      //     first: "Ada",
-      //     last: "Lovelace",
-      //     born: 1815
-      //   });
-      //   console.log("Document written with ID: ", docRef.id);
-      // } catch (e) {
-      //   console.error("Error adding document: ", e);
-      // }
-      const userRef = doc(db, "users", email)
-      try {
-        const docRef = await setDoc(userRef,{
-          first: "Ada",
-          last: "Lovelace",
-          born: 1815
-        });
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
-  };
 
     const logIn = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault(); // Prevent form submission
@@ -46,7 +38,9 @@ export const SignUpPage = () => {
           await createUserWithEmailAndPassword(auth,email,password)
           .then((userCredential)=>{
               const user = userCredential.user;
+              createData(event, email, "Email");
               alert("Signed up successfully!");
+              
           })
           } catch (err){
               console.error(err);
@@ -86,12 +80,6 @@ export const SignUpPage = () => {
                 </div>
                 <a href="#" className="forgot-password-link">Forgot password?</a>
             </div>
-            <button
-              onClick={createData}
-              className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded"
-            >
-              Create Data
-            </button>
             {/* Login Button */}
             <button
               onClick={logIn}
