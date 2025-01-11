@@ -36,6 +36,7 @@
   align-items: center;
   justify-content: center;
   background: #F9F8FF;
+  color: black;
   border: 1px solid #D5CBFF;
   transition: 0.3s ease;
 }

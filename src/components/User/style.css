@@ -188,3 +188,74 @@
     cursor: not-allowed;
   }
   
+  /* style.css */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+button {
+  background-color: #007BFF;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+th {
+  padding: 12px;
+  border: 1px solid #ddd;
+  background-color: #007BFF;
+  color: #fff;
+  text-align: left;
+  font-size: 16px;
+}
+
+td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.user-info {
+  display: flex;
+  justify-content: space-between;  /* This will place the points text and the button at opposite ends */
+  align-items: center;  /* Vertically center the text and button */
+}
+
+.user-info-actions {
+  display: flex;
+  justify-content: flex-end;  /* Aligns the button to the right */
+}
+
+.user-info-actions button {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 20px; /* Adds some space between the points and the button */
+}

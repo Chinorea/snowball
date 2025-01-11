@@ -1,0 +1,162 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fc;
+  margin: 0;
+  padding: 20px; /* Add padding instead of flex */
+}
+
+/* Remove the flex properties here */
+.user-management-container {
+  width: 80%;
+  max-width: 800px;
+  margin: 20px auto; /* Center the container horizontally */
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+
+/* Title for the page */
+h1 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* User form styling */
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.user-form input,
+.user-form select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.user-form input:focus,
+.user-form select:focus {
+  border-color: #007bff;
+}
+
+.user-form button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.user-form button:hover {
+  background-color: #0056b3;
+}
+
+/* User list styling */
+.user-list {
+  margin-top: 30px;
+}
+
+.user-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.user-list li {
+  background-color: #f9f9f9;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-list li p {
+  margin: 5px 0;
+}
+
+.user-list li strong {
+  font-weight: bold;
+}
+
+/* Loading and error message */
+.loading,
+.error {
+  text-align: center;
+  color: #333;
+  font-size: 18px;
+}
+
+.user-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-actions {
+  /* display: flex; */
+  flex-direction: column;
+  
+  justify-content: space-between;
+}
+
+/* Modify button colors */
+.suspend-button {
+  background-color: #dc3545; /* Red */
+}
+
+.activate-button {
+  background-color: #28a745; /* Green */
+}
+
+/* Hover effect for each button */
+.suspend-button:hover {
+  background-color: #c82333;
+}
+
+.activate-button:hover {
+  background-color: #218838;
+}
+
+/* Default button styles for other buttons */
+button {
+  padding: 8px 12px;
+  margin: 5px;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}

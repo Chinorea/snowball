@@ -1,12 +1,12 @@
 import { Container } from "@/components/Container";
 import { UserNavbar } from "@/components/User/UserNavBar";
-import { VoucherCard } from "@/components/User/VoucherCard";
+import { TransactionHistoryPage } from "@/components/User/TransactionHistoryPage";
 
-export default function Voucher() {
+export default function TransactionHistory() {
   return (
     <Container>
         <UserNavbar /> 
-        <VoucherCard />
+        <TransactionHistoryPage />
     </Container>
   );
 }
