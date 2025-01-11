@@ -2,13 +2,30 @@
 
 import { Container } from "@/components/Container";
 import { useRouter } from "next/navigation";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
+import { useState } from "react";
 
 export default function Home() {
   const router = useRouter(); // Initialize the router
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const logIn = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
     router.push("/Dashboard"); // Navigate to the dashboard
+  };
+
+  const signUp = async(event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // Prevent form submission
+    try{
+      await createUserWithEmailAndPassword(auth,email,password)
+      .then((userCredential)=>{
+          const user = userCredential.user;
+      })
+      } catch (err){
+          console.error(err);
+      }
   };
 
   return (
@@ -23,6 +40,7 @@ export default function Home() {
                 id="username"
                 className="bg-gray-200 dark:bg-gray-700 dark:text-white rounded pl-12 py-2 md:py-4 focus:outline-none w-full"
                 placeholder="Email Address"
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             {/* Password Input */}
@@ -32,6 +50,7 @@ export default function Home() {
                 id="password"
                 className="bg-gray-200 dark:bg-gray-700 dark:text-white rounded pl-12 py-2 md:py-4 focus:outline-none w-full"
                 placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             {/* Login Button */}
@@ -43,6 +62,7 @@ export default function Home() {
             </button>
             {/* Signup Button */}
             <button
+              onClick={signUp}
               className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded mt-4"
             >
               Sign Up
