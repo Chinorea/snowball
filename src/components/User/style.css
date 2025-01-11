@@ -1,0 +1,99 @@
+.voucher-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+
+/* Card Styling */
+.voucher-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 200px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Card Content */
+  .voucher-content {
+    flex-grow: 1;
+    margin-bottom: 10px;
+  }
+  
+  .voucher-card h3 {
+    margin-top: 0;
+  }
+  
+  .voucher-card p {
+    margin: 4px 0;
+  }
+  
+/* Button Styling */
+.popup-button {
+    background-color: blue;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    margin-top: 5px;
+  }
+  
+  .popup-button:hover {
+    background-color: darkblue;
+  }
+  
+  /* Popup Overlay */
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Popup Content */
+  .popup-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    width: 350px;
+    position: relative;
+  }
+  
+  /* Buttons in Popup */
+  .popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .popup-buttons button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .popup-buttons button:nth-child(2) {
+    background-color: green;
+  }
+  
+  .popup-buttons button:hover {
+    opacity: 0.9;
+  }

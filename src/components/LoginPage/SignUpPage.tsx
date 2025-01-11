@@ -3,7 +3,7 @@ import "./index.css"
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { useState } from "react";
-import { collection, getDoc, setDoc, doc, addDoc } from "firebase/firestore";
+import { collection, getDoc, setDoc, doc, addDoc, query, getDocs } from "firebase/firestore";
 import { sign } from "node:crypto";
 
 
@@ -44,22 +44,33 @@ export const createNestedData = async (event: React.MouseEvent<HTMLButtonElement
 export const getData = async (event: React.MouseEvent<HTMLButtonElement>, email: string) => {
   event.preventDefault(); // Prevent form submission
   const docRef = doc(db, "users", email);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    //Retrival of data by data.{KeyName}
-    const userType = data.usertype;
-    const name = data.name;
-    const loginMethod = data.loginMethod;
+  // const docRef = query(collection(db, "users"));
+  // docRef.collection("Vouchers");
+  const voucherCollection = collection(docRef, "Vouchers")
+  const docSnap = await getDocs(voucherCollection);
+  
+  // if (docSnap.exists()) {
+  //   const data = docSnap.data();
+  //   //Retrival of data by data.{KeyName}
+  //   const userType = data.usertype;
+  //   const name = data.name;
+  //   const loginMethod = data.loginMethod;
+  //   const voucher = data.Vouchers;
 
     // Log the extracted data
-    console.log("User Type:", userType);
-    console.log("Name:", name);
-    console.log("Login Method:", loginMethod);
-  } else {
-    // doc.data() will be undefined in this case
-    console.log("No such document!");
-  }
+    // console.log("User Type:", userType);
+    // console.log("Name:", name);
+    // console.log("Login Method:", loginMethod);
+    // console.log("Voucher:", voucher);
+    docSnap.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+    });
+  // } 
+  // else {
+  //   // doc.data() will be undefined in this case
+  //   console.log("No such document!");
+  // }
 };
 
 export const SignUpPage = () => {
