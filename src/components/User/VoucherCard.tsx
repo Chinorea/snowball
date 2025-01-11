@@ -117,9 +117,11 @@ export const VoucherCard = () => {
                       <>
                         <h2>Voucher QR Code</h2>
                         {/* Display QR Code containing VoucherID */}
-                        <QRCodeSVG value={voucher.VoucherID} size={200} />
-                        <p>Scan this QR code to use the voucher.</p>
-                        <button onClick={() => togglePopup(voucher.id)}>Close</button>
+                        <div className="qr-code-container">
+                            <QRCodeSVG value={voucher.VoucherID} size={200} />
+                            <p>Scan this QR code to use the voucher.</p>
+                            <button onClick={() => togglePopup(voucher.id)}>Close</button>
+                        </div>
                       </>
                     )}
                   </div>

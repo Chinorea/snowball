@@ -2,13 +2,13 @@ import { Container } from "@/components/Container";
 import { UserNavbar } from "@/components/User/UserNavBar";
 
 import { benefitOne, benefitTwo } from "@/components/data";
-import { VoucherCard } from "@/components/User/VoucherCard";
+import { ProductCardPage } from "@/components/User/Productcard";
 
 export default function product() {
   return (
     <Container>
         <UserNavbar /> 
-        <VoucherCard />
+        <ProductCardPage />
     </Container>
   );
 }
