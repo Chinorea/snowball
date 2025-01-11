@@ -37,7 +37,7 @@ export const SignUpPage = () => {
 
     const logIn = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault(); // Prevent form submission
-        router.push("/Dashboard"); // Navigate to the dashboard
+        router.push("/Voucher"); // Navigate to the dashboard
     };
 
       const signUp = async(event: React.MouseEvent<HTMLButtonElement>) => {
