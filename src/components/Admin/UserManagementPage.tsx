@@ -8,7 +8,8 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db, auth } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
 import "./style.css"; // Include the CSS file
 import { getCurrentUserEmail, getIsAdmin } from "../User/userInfo";
@@ -66,7 +67,8 @@ export const UserManagementPage = () => {
   const addUser = async (usertype: string) => {
     try {
       const userCollectionRef = collection(db, "users");
-      const newUserRef = doc(userCollectionRef); 
+      const newUserRef = doc(userCollectionRef, newUser.email); 
+      const defaultPassword = "12345678";
 
       await setDoc(newUserRef, {
         username: newUser.username,
@@ -75,6 +77,8 @@ export const UserManagementPage = () => {
         status: "Active",
         usertype: usertype,
       });
+
+      await createUserWithEmailAndPassword(auth, newUser.email, defaultPassword);
 
       setNewUser({ username: "", email: "", points: 0 });
       setUserType("user");

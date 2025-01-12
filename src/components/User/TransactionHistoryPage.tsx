@@ -24,7 +24,8 @@ export const TransactionHistoryPage = () => {
 
   const fetchTransactions = async () => {
     const currentUserEmail = getCurrentUserEmail();
-    if(getIsAdmin()){
+    const isAdmin = getIsAdmin();
+    if(isAdmin == true || currentUserEmail == ""){
       router.push("/");
     }
     setLoading(true);

@@ -2,12 +2,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Disclosure } from "@headlessui/react";
+import { clearCurrentUserEmail, setIsUser } from "./userInfo";
+import { useRouter } from "next/navigation";
 
 export const UserNavbar = () => {
+  const router = useRouter();
   const navigation = [
     { label: "Product", href: "/Product" },
     { label: "Voucher", href: "/Voucher" },
   ];
+
+  const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    clearCurrentUserEmail();
+    setIsUser();
+    router.push("/");
+  }
 
   return (
     <div className="w-full bg-light-blue">
@@ -32,9 +41,11 @@ export const UserNavbar = () => {
         {/* Get Started / Log Out */}
         <div className="gap-3 nav__item mr-2 lg:flex ml-auto lg:ml-0 lg:order-2">
           <div className="hidden mr-3 lg:flex nav__item">
-            <Link href="/" className="px-6 py-2 text-white bg-indigo-600 rounded-md md:ml-5">
+            <button 
+              onClick={handleLogout}
+              className="px-6 py-2 text-white bg-indigo-600 rounded-md md:ml-5">
               Log Out
-            </Link>
+            </button>
           </div>
         </div>
 

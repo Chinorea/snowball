@@ -63,7 +63,7 @@ export const LoginDetails = () => {
             if (userType === "Admin") {
               setIsAdmin();
               router.push("/Dashboard"); // Navigate to Admin Dashboard
-            } else if (userType === "User") {
+            } else if (userType === "User" || userType === "user") {
               setIsUser();
               router.push("/Product"); // Navigate to User Voucher Page
             } else {
