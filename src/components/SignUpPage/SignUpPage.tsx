@@ -1,74 +1,16 @@
 import { useRouter } from "next/navigation";
 import "./index.css";
 import {
-  getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import { auth, db } from "@/firebase/firebaseConfig";
+import { auth } from "@/firebase/firebaseConfig";
 import { useState } from "react";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-
-export const createData = async (
-  event: React.MouseEvent<HTMLButtonElement>,
-  email: string,
-  method: string
-) => {
-  event.preventDefault(); // Prevent form submission
-  const userRef = doc(db, "users", email);
-  try {
-    await setDoc(
-      userRef,
-      {
-        usertype: "User",
-        name: email,
-        loginMethod: method,
-      },
-      { merge: true }
-    );
-    console.log("Document successfully written!");
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-};
+import { createData } from "../LoginPage/LoginDetails";
 
 export const SignUpPage = () => {
   const router = useRouter(); // Initialize the router
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const logIn = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Prevent form submission
-    try {
-      await signInWithEmailAndPassword(auth, email, password).then(
-        async (userCredential) => {
-          const user = userCredential.user;
-
-          // Fetch usertype from Firestore
-          const userRef = doc(db, "users", email);
-          const userSnap = await getDoc(userRef);
-
-          if (userSnap.exists()) {
-            const userType = userSnap.data()?.usertype;
-
-            // Route based on usertype
-            if (userType === "Admin") {
-              router.push("/Dashboard"); // Navigate to Admin Dashboard
-            } else if (userType === "User") {
-              router.push("/Product"); // Navigate to User Voucher Page
-            } else {
-              alert("Invalid usertype. Please contact support.");
-            }
-          } else {
-            alert("No user data found. Please sign up.");
-          }
-        }
-      );
-    } catch (err) {
-      console.error(err);
-      alert(err);
-    }
-  };
 
   const signUp = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
@@ -78,6 +20,7 @@ export const SignUpPage = () => {
           const user = userCredential.user;
           createData(event, email, "Email");
           alert("Signed up successfully!");
+          router.push("/");
         }
       );
     } catch (err) {
@@ -115,17 +58,7 @@ export const SignUpPage = () => {
             onChange={(ev) => setPassword(ev.target.value)}
           />
         </div>
-        <a href="#" className="forgot-password-link">
-          Forgot password?
-        </a>
       </div>
-      {/* Login Button */}
-      <button
-        onClick={logIn}
-        className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded"
-      >
-        Log In
-      </button>
       {/* Signup Button */}
       <button
         onClick={signUp}

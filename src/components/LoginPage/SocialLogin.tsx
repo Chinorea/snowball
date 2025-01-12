@@ -2,7 +2,7 @@ import "./index.css"
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth, provider } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
-import { createData } from "./SignUpPage";
+import { createData } from "./LoginDetails";
 
 
 export const SocialLogin = () => {
