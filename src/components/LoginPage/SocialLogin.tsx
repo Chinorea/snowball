@@ -1,13 +1,39 @@
 import "./index.css"
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, provider } from "@/firebase/firebaseConfig";
+import { auth, provider, db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { createData } from "./LoginDetails";
+import { setCurrentUserEmail, setIsAdmin, setIsUser } from "../User/userInfo";
+import { doc, getDoc } from "firebase/firestore";
 
 
 export const SocialLogin = () => {
     const router = useRouter(); // Initialize the router
     
+    const redirectUser = async (event: React.MouseEvent<HTMLButtonElement>, email: string) => {
+          const userRef = doc(db, "users", email);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const userType = userSnap.data()?.usertype;
+
+            // Route based on usertype
+            if (userType === "Admin") {
+              setIsAdmin();
+              router.push("/Dashboard"); // Navigate to Admin Dashboard
+            } else if (userType === "User" || userType === "user") {
+              setIsUser();
+              router.push("/Product"); // Navigate to User Voucher Page
+            } else {
+              alert("Invalid usertype. Please contact support.");
+            }
+          } else {
+            createData(event, email, "Google")
+            setIsUser();
+            router.push("/Product");
+          }
+    }
+
     const googleLogIn = async(event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault(); // Prevent form submission
         signInWithPopup(auth, provider)
@@ -24,9 +50,8 @@ export const SocialLogin = () => {
           if(email == null){
             return;
           }
-          console.log(user);
-          createData(event, email, "Google");
-          router.push("/Dashboard");
+          setCurrentUserEmail(email);
+          redirectUser(event, email);
         }).catch((error) => {
           // Handle Errors here.
           const errorCode = error.code;
