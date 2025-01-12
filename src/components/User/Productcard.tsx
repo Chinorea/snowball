@@ -34,7 +34,6 @@ export const ProductCardPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
-
   // Fetch products from Firestore
   const fetchProducts = async () => {
     setLoading(true);
@@ -66,10 +65,8 @@ export const ProductCardPage = () => {
   const fetchUser = async () => {
     const currentUserEmail = getCurrentUserEmail();
     try {
-      //const userDocRef = doc(db, "users", "testing@gmail.com");
-      //alert(currentUserEmail);
-      if(currentUserEmail == null){
-        router.push("");
+      if (!currentUserEmail) {
+        router.push("/Login");
       }
       const userDocRef = doc(db, "users", currentUserEmail);
       const userDoc = await getDoc(userDocRef);
@@ -121,7 +118,7 @@ export const ProductCardPage = () => {
           name: product.name,
           stock: product.stock,
           pointsRequired: product.pointsRequired,
-          quantity: 1, // Initial quantity is 1
+          quantity: 1,
         });
         alert(`${product.name} has been added to your cart.`);
       }
@@ -129,6 +126,10 @@ export const ProductCardPage = () => {
       console.error("Error adding product to cart:", err);
       alert("Failed to add product to cart. Please try again.");
     }
+  };
+
+  const handlePreOrder = (product: Product) => {
+    router.push("/Preorder");
   };
 
   const filteredProducts = products.filter((product) =>
@@ -145,8 +146,7 @@ export const ProductCardPage = () => {
 
   return (
     <div>
-      <h1>Product Redemption</h1>
-
+      <h1></h1>
       {user && (
         <div className="user-info">
           <p>
@@ -155,6 +155,9 @@ export const ProductCardPage = () => {
           <div className="user-info-actions">
             <button onClick={() => router.push("/TransactionHistory")}>
               View Transaction History
+            </button>
+            <button onClick={() => router.push("/Preorderlist")}>
+              View Pre-order
             </button>
           </div>
         </div>
@@ -180,12 +183,25 @@ export const ProductCardPage = () => {
               <p>
                 <strong>Points Required:</strong> {product.pointsRequired}
               </p>
-              <button
-                className="add-to-cart-button"
-                onClick={() => handleAddToCart(product)}
-              >
-                Add to Cart
-              </button>
+              {product.stock > 0 ? (
+                <button
+                  className="add-to-cart-button"
+                  onClick={() => handleAddToCart(product)}
+                >
+                  Add to Cart
+                </button>
+              ) : (
+                <button
+                  className="preorder-button"
+                  onClick={() =>
+                    router.push(
+                      `/Preorder?productName=${product.name}&pointsRequired=${product.pointsRequired}`
+                    )
+                  }
+                >
+                  Pre-order
+                </button>
+              )}
             </div>
           ))
         ) : (

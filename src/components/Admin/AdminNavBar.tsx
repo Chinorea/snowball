@@ -10,13 +10,14 @@ export const AdminNavbar = () => {
         { label: "Voucher Approval", href: "/VoucherApproval" },
         { label: "Inventory", href: "/Inventory" },
         { label: "Product Request", href: "/ProductReq" },
+        { label: "Pre-ordered Request", href: "/PreorderReq" },
       ];
 
   return (
     <div className="w-full">
       <nav className="container relative flex flex-wrap items-center justify-between p-8 mx-auto lg:justify-between xl:px-1">
         {/* Logo  */}
-        <Link href="/">
+        <Link href="/Dashboard">
           <span className="flex items-center space-x-2 text-2xl font-medium text-indigo-500 dark:text-gray-100">
             <span>
               <Image

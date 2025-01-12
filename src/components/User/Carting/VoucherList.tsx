@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
+import { getCurrentUserEmail } from "../userInfo";
 
 export const VoucherList = ({ setSelectedVoucher }: { setSelectedVoucher: (voucherId: string) => void }) => {
   const [vouchers, setVouchers] = useState<any[]>([]);
@@ -9,7 +10,8 @@ export const VoucherList = ({ setSelectedVoucher }: { setSelectedVoucher: (vouch
 
   const fetchVouchers = async () => {
     try {
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const CurrentUserEmail = getCurrentUserEmail();
+      const userDocRef = doc(db, "users", CurrentUserEmail);
       const vouchersCollectionRef = collection(userDocRef, "Vouchers");
       const vouchersSnapshot = await getDocs(vouchersCollectionRef);
       const fetchedVouchers = vouchersSnapshot.docs.map((doc) => {

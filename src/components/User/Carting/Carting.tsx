@@ -6,6 +6,7 @@ import { db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { VoucherList } from "./VoucherList";
 import "./style.css";
+import { getCurrentUserEmail } from "../userInfo";
 
 export const Carting = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
@@ -14,11 +15,12 @@ export const Carting = () => {
   const [startingPoints, setStartingPoints] = useState<number>(0);
   const [calculatedRemainingPoints, setCalculatedRemainingPoints] = useState<number | null>(null);
   const router = useRouter();
+  const CurrentUserEmail = getCurrentUserEmail();
 
   // Function to fetch cart items and user points
   const fetchCartItemsAndPoints = async () => {
     try {
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartCollectionRef = collection(userDocRef, "CartList");
 
       // Fetch cart items
@@ -75,7 +77,7 @@ export const Carting = () => {
       calculateRemainingPoints(startingPoints, updatedItems);
 
       // Update Firestore
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartDocRef = doc(userDocRef, "CartList", id);
       await updateDoc(cartDocRef, { quantity: newQuantity });
     } catch (error) {
@@ -95,7 +97,7 @@ export const Carting = () => {
       calculateRemainingPoints(startingPoints, updatedItems);
 
       // Remove from Firestore
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartDocRef = doc(userDocRef, "CartList", id);
       await deleteDoc(cartDocRef);
     } catch (error) {
@@ -107,7 +109,7 @@ export const Carting = () => {
   const handleCheckout = async () => {
     try {
       const batch = writeBatch(db);
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
 
       // Fetch user data
       const userDoc = await getDoc(userDocRef);

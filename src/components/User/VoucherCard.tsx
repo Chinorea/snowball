@@ -84,7 +84,7 @@ export const VoucherCard = () => {
   // Render voucher cards
   return (
     <div>
-      <h1>Vouchers</h1>
+      <h1></h1>
       <div className="voucher-container">
         {vouchers.length > 0 ? (
           vouchers.map((voucher) => (
