@@ -5,6 +5,8 @@ import { doc, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { QRCodeSVG } from "qrcode.react";
 import "./style.css";
+import { getCurrentUserEmail, getIsAdmin } from "./userInfo";
+import router from "next/router";
 
 export const VoucherCard = () => {
   const [vouchers, setVouchers] = useState<any[]>([]); // State to store vouchers
@@ -23,9 +25,14 @@ export const VoucherCard = () => {
 
   // Fetch vouchers from Firestore
   const fetchVouchers = async () => {
+    const currentUserEmail = getCurrentUserEmail();
+    if(getIsAdmin()){
+      router.push("/");
+    }
     try {
       // Reference to the user's document and Vouchers subcollection
-      const userDocRef = doc(db, "users", "tester@gmail.com"); //TODO: bring actual Email
+      const userDocRef = doc(db, "users", currentUserEmail); //TODO: bring actual Email
+
       const vouchersCollectionRef = collection(userDocRef, "Vouchers");
 
       // Fetch all documents in the Vouchers subcollection

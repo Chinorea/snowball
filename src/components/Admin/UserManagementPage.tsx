@@ -11,6 +11,7 @@ import {
 import { db } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
 import "./style.css"; // Include the CSS file
+import { getCurrentUserEmail, getIsAdmin } from "../User/userInfo";
 
 interface User {
   id: string;
@@ -34,6 +35,10 @@ export const UserManagementPage = () => {
 
   // Fetch users from Firestore
   const fetchUsers = async () => {
+    //Check for user type
+    if(getCurrentUserEmail() == "" || getIsAdmin() == false){
+      router.push("/");
+    }
     setLoading(true);
     try {
       const userCollectionRef = collection(db, "users");

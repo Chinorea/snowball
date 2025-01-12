@@ -12,7 +12,7 @@ import {
 import { db } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
 import "./style.css"; // Include the CSS file
-import { getCurrentUserEmail } from "./userInfo";
+import { getCurrentUserEmail, getIsAdmin } from "./userInfo";
 
 interface Product {
   id: string;
@@ -75,11 +75,10 @@ export const ProductCardPage = () => {
   // Fetch user points from Firestore
   const fetchUser = async () => {
     const currentUserEmail = getCurrentUserEmail();
+    const isAdmin = getIsAdmin();
     try {
-      //const userDocRef = doc(db, "users", "testing@gmail.com");
-      //alert(currentUserEmail);
-      if(currentUserEmail == null){
-        router.push("");
+      if(currentUserEmail == "" || isAdmin == true){
+        router.push("/");
       }
       const userDocRef = doc(db, "users", currentUserEmail);
       const userDoc = await getDoc(userDocRef);

@@ -8,7 +8,7 @@ import {
 import { auth, db } from "@/firebase/firebaseConfig";
 import { useState } from "react";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { setCurrentUserEmail } from "../User/userInfo";
+import { setCurrentUserEmail, setIsAdmin, setIsUser } from "../User/userInfo";
 
 
 export const createData = async (
@@ -61,8 +61,10 @@ export const LoginDetails = () => {
             setCurrentUserEmail(email);
             // Route based on usertype
             if (userType === "Admin") {
+              setIsAdmin();
               router.push("/Dashboard"); // Navigate to Admin Dashboard
             } else if (userType === "User") {
+              setIsUser();
               router.push("/Product"); // Navigate to User Voucher Page
             } else {
               alert("Invalid usertype. Please contact support.");

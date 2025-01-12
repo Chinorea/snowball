@@ -5,6 +5,7 @@ import { collection, getDocs, doc, Timestamp } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import "./style.css";
+import { getCurrentUserEmail, getIsAdmin } from "./userInfo";
 
 interface Transaction {
   id: string;
@@ -22,10 +23,13 @@ export const TransactionHistoryPage = () => {
   const router = useRouter();
 
   const fetchTransactions = async () => {
-    const userId = "tester@gmail.com"; // Replace with actual user ID
+    const currentUserEmail = getCurrentUserEmail();
+    if(getIsAdmin()){
+      router.push("/");
+    }
     setLoading(true);
     try {
-      const transactionsRef = collection(db, "users", userId, "transactions");
+      const transactionsRef = collection(db, "users", currentUserEmail, "transactions");
       const transactionSnapshot = await getDocs(transactionsRef);
 
       const fetchedTransactions = transactionSnapshot.docs
