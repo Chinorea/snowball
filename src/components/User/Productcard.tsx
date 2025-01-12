@@ -6,8 +6,8 @@ import {
   getDocs,
   doc,
   getDoc,
+  setDoc,
   updateDoc,
-  writeBatch,
 } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
@@ -25,22 +25,12 @@ interface User {
   points: number;
 }
 
-interface Transaction {
-  id: string;
-  productId: string;
-  productName: string;
-  pointsSpent: number;
-  timestamp: string;
-}
-
 export const ProductCardPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [showTransactions, setShowTransactions] = useState(false);
   const router = useRouter();
 
   // Fetch products from Firestore
@@ -73,7 +63,7 @@ export const ProductCardPage = () => {
   // Fetch user points from Firestore
   const fetchUser = async () => {
     try {
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", "tester@gmail.com"); // Replace with dynamic user ID
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
@@ -89,93 +79,48 @@ export const ProductCardPage = () => {
     }
   };
 
-  // Fetch transaction history for the user
-  const fetchTransactions = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const transactionsRef = collection(db, "users", user.id, "transactions");
-      const transactionSnapshot = await getDocs(transactionsRef);
-
-      const fetchedTransactions = transactionSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Transaction[];
-
-      setTransactions(fetchedTransactions);
-    } catch (err) {
-      console.error("Error fetching transactions:", err);
-      setError("Failed to fetch transactions. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchProducts();
     fetchUser();
   }, []);
 
-  const handleRedeem = async (product: Product) => {
+  const handleAddToCart = async (product: Product) => {
     if (!user) {
       alert("User data is not loaded.");
       return;
     }
 
-    if (product.pointsRequired > user.points) {
-      alert("Not enough points to redeem this product.");
-      return;
-    }
+    try {
+      const cartRef = collection(db, "users", user.id, "CartList");
+      const cartDocRef = doc(cartRef, product.id);
 
-    if (product.stock > 0) {
-      try {
-        const productRef = doc(db, "Products", product.id);
-        const userRef = doc(db, "users", user.id);
-        const transactionsRef = collection(userRef, "transactions");
+      // Check if the product already exists in the cart
+      const cartDoc = await getDoc(cartDocRef);
 
-        const updatedStock = product.stock - 1;
-        const updatedPoints = user.points - product.pointsRequired;
-
-        const batch = writeBatch(db);
-
-        batch.update(productRef, { Stock: updatedStock });
-        batch.update(userRef, { Points: updatedPoints });
-
-        const transactionDoc = doc(transactionsRef);
-        batch.set(transactionDoc, {
-          productId: product.id,
-          productName: product.name,
-          pointsSpent: product.pointsRequired,
-          timestamp: new Date().toISOString(),
+      if (cartDoc.exists()) {
+        // If product exists, check quantity and stock
+        const currentQuantity = cartDoc.data()?.quantity || 0;
+        if (currentQuantity < product.stock) {
+          const newQuantity = currentQuantity + 1;
+          await updateDoc(cartDocRef, { quantity: newQuantity });
+          alert(`${product.name} quantity updated in your cart.`);
+        } else {
+          alert(`Cannot add more than ${product.stock} of ${product.name} to your cart.`);
+        }
+      } else {
+        // If the product does not exist in the cart, add it with quantity 1
+        await setDoc(cartDocRef, {
+          name: product.name,
+          stock: product.stock,
+          pointsRequired: product.pointsRequired,
+          quantity: 1, // Initial quantity is 1
         });
-
-        await batch.commit();
-
-        setProducts((prevProducts) =>
-          prevProducts.map((p) =>
-            p.id === product.id ? { ...p, stock: updatedStock } : p
-          )
-        );
-
-        setUser((prevUser) =>
-          prevUser ? { ...prevUser, points: updatedPoints } : null
-        );
-
-        alert(`Redeemed: ${product.name}`);
-      } catch (err) {
-        console.error("Error redeeming product:", err);
-        alert("Failed to redeem product. Please try again.");
+        alert(`${product.name} has been added to your cart.`);
       }
-    } else {
-      alert(`Sorry, ${product.name} is out of stock.`);
+    } catch (err) {
+      console.error("Error adding product to cart:", err);
+      alert("Failed to add product to cart. Please try again.");
     }
-  };
-
-  const toggleTransactionHistory = async () => {
-    if (!showTransactions) {
-      await fetchTransactions();
-    }
-    setShowTransactions((prev) => !prev);
   };
 
   const filteredProducts = products.filter((product) =>
@@ -204,7 +149,7 @@ export const ProductCardPage = () => {
               View Transaction History
             </button>
           </div>
-    </div>
+        </div>
       )}
 
       <div className="search-bar">
@@ -228,13 +173,10 @@ export const ProductCardPage = () => {
                 <strong>Points Required:</strong> {product.pointsRequired}
               </p>
               <button
-                className="redeem-button"
-                onClick={() => handleRedeem(product)}
-                disabled={
-                  product.stock <= 0 || product.pointsRequired > (user?.points || 0)
-                }
+                className="add-to-cart-button"
+                onClick={() => handleAddToCart(product)}
               >
-                {product.stock > 0 ? "Redeem" : "Out of Stock"}
+                Add to Cart
               </button>
             </div>
           ))

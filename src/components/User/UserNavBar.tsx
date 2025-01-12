@@ -2,18 +2,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Disclosure } from "@headlessui/react";
+import { useState } from "react";
 
 export const UserNavbar = () => {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const navigation = [
     { label: "Product", href: "/Product" },
     { label: "Voucher", href: "/Voucher" },
   ];
 
+  const handleConfirmLogout = () => {
+    // Handle logout logic here
+    window.location.href = "/";
+  };
+
   return (
     <div className="w-full bg-light-blue">
-     <nav className="container relative flex flex-wrap items-center justify-between p-4 mx-auto lg:justify-between xl:px-1 bg-light-blue rounded-lg shadow-lg">
-
-
+      <nav className="container relative flex flex-wrap items-center justify-between p-4 mx-auto lg:justify-between xl:px-1 bg-light-blue rounded-lg shadow-lg">
         {/* Logo */}
         <Link href="/">
           <span className="flex items-center space-x-2 text-2xl font-medium text-indigo-500 dark:text-gray-100">
@@ -29,12 +35,26 @@ export const UserNavbar = () => {
           </span>
         </Link>
 
-        {/* Get Started / Log Out */}
+        {/* Cart and Log Out */}
         <div className="gap-3 nav__item mr-2 lg:flex ml-auto lg:ml-0 lg:order-2">
           <div className="hidden mr-3 lg:flex nav__item">
-            <Link href="/" className="px-6 py-2 text-white bg-indigo-600 rounded-md md:ml-5">
-              Log Out
+            {/* Cart Button */}
+            <Link
+              href="/Cart"
+              className="px-6 py-2 text-white bg-green-600 rounded-md md:ml-5 hover:bg-green-700 flex items-center justify-center"
+              style={{ height: "40px" }}
+            >
+              Cart
             </Link>
+
+            {/* Log Out Button */}
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="px-6 py-2 text-white bg-indigo-600 rounded-md md:ml-5 hover:bg-indigo-700 flex items-center justify-center"
+              style={{ height: "40px" }}
+            >
+              Log Out
+            </button>
           </div>
         </div>
 
@@ -61,7 +81,7 @@ export const UserNavbar = () => {
                   {!open && (
                     <path
                       fillRule="evenodd"
-                      d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
+                      d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0-2H4a1 1 0 0 1 0-2z"
                     />
                   )}
                 </svg>
@@ -78,6 +98,22 @@ export const UserNavbar = () => {
                       {item.label}
                     </Link>
                   ))}
+
+                  {/* Cart (Mobile View) */}
+                  <Link
+                    href="/Cart"
+                    className="w-full px-4 py-2 -ml-4 text-gray-500 rounded-md dark:text-gray-300 hover:text-green-600 focus:text-green-600 focus:bg-green-100 dark:focus:bg-gray-800 focus:outline-none"
+                  >
+                    Cart
+                  </Link>
+
+                  {/* Log Out (Mobile View) */}
+                  <button
+                    onClick={() => setShowLogoutModal(true)}
+                    className="w-full px-4 py-2 text-left text-gray-500 rounded-md dark:text-gray-300 hover:text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-gray-800 focus:outline-none"
+                  >
+                    Log Out
+                  </button>
                 </>
               </Disclosure.Panel>
             </>
@@ -100,6 +136,34 @@ export const UserNavbar = () => {
           </ul>
         </div>
       </nav>
+
+      {/* Logout Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="w-full max-w-md p-6 bg-white rounded-md shadow-lg">
+            <h2 className="text-lg font-bold text-gray-800">
+              Confirm Logout
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex items-center justify-end mt-4 space-x-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmLogout}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+              >
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

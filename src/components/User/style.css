@@ -259,3 +259,137 @@ tr:nth-child(odd) {
   cursor: pointer;
   margin-left: 20px; /* Adds some space between the points and the button */
 }
+
+/* Carting Styling */
+
+
+.cart-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cart-header {
+  text-align: center;
+  font-size: 2rem;
+  color: #6a1b9a;
+  margin-bottom: 20px;
+}
+
+h5 {
+  color: #4a148c;
+  margin-bottom: 10px;
+}
+
+h4 {
+  color: #3f51b5;
+}
+
+/* Cart items styling */
+.cart-items {
+  margin-bottom: 20px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-item-details {
+  flex: 1;
+}
+
+.quantity-selector input {
+  width: 60px;
+  padding: 5px;
+  font-size: 1rem;
+  margin-left: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.voucher-section,
+.payment-method {
+  margin-bottom: 20px;
+}
+
+/* Select elements */
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  background-color: #f0f0f0;
+  color: #4a148c;
+}
+
+/* Checkout button */
+.checkout-btn-container {
+  text-align: center;
+}
+
+.checkout-btn {
+  padding: 10px 20px;
+  background-color: #6a1b9a;
+  color: white;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-btn:hover {
+  background-color: #4a148c;
+}
+
+.checkout-btn:active {
+  background-color: #3f51b5;
+}
+
+/* style.css */
+
+/* Cross button styling */
+.remove-item-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #f44336; /* Red color */
+  cursor: pointer;
+  margin-left: 15px;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.remove-item-btn:hover {
+  color: #d32f2f;
+}
+
+/* Additional styling */
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-item-details {
+  flex: 1;
+}
+
+.quantity-selector input {
+  width: 60px;
+  padding: 5px;
+  font-size: 1rem;
+  margin-left: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
