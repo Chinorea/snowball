@@ -3,13 +3,11 @@ import "./index.css";
 import {
   getAuth,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { useState } from "react";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { setCurrentUserEmail, setIsAdmin, setIsUser } from "../User/userInfo";
-
 
 export const createData = async (
   event: React.MouseEvent<HTMLButtonElement>,
@@ -38,12 +36,11 @@ export const createData = async (
   }
 };
 
-
 export const LoginDetails = () => {
   const router = useRouter(); // Initialize the router
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");;
-
+  const [password, setPassword] = useState("");
+  const [isSuspended, setIsSuspended] = useState(false); // State for suspension popup
 
   const logIn = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
@@ -52,13 +49,22 @@ export const LoginDetails = () => {
         async (userCredential) => {
           const user = userCredential.user;
 
-          // Fetch usertype from Firestore
+          // Fetch user data from Firestore
           const userRef = doc(db, "users", email);
           const userSnap = await getDoc(userRef);
 
           if (userSnap.exists()) {
             const userType = userSnap.data()?.usertype;
+            const userStatus = userSnap.data()?.status;
+
+            // Check if the user is suspended
+            if (userStatus === "Suspended") {
+              setIsSuspended(true); // Show the suspended popup
+              return; // Prevent further navigation
+            }
+
             setCurrentUserEmail(email);
+
             // Route based on usertype
             if (userType === "Admin") {
               setIsAdmin();
@@ -85,9 +91,30 @@ export const LoginDetails = () => {
     router.push("/SignUpPage");
   };
 
+  const handleReturnToLogin = () => {
+    setIsSuspended(false); // Close the popup
+    router.push("/"); // Redirect to the login page
+  };
+
   return (
     <div>
-      {/* Email Input */}
+      {/* Suspended Popup */}
+      {isSuspended && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h2>User Suspended</h2>
+            <p>Your account is currently suspended. Please contact support for assistance.</p>
+            <button
+              onClick={handleReturnToLogin}
+              className="bg-red-600 text-white p-2 rounded"
+            >
+              Return to Login
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Login Form */}
       <div className="flex items-center text-lg mb-6 md:mb-8 relative">
         <svg className="absolute ml-3" width="24" viewBox="0 0 24 24">
           <path d="M20.822 18.096c-3.439-.794-6.64-1.49-5.09-4.418 4.72-8.912 1.251-13.678-3.732-13.678-5.082 0-8.464 4.949-3.732 13.678 1.597 2.945-1.725 3.641-5.09 4.418-3.073.71-3.188 2.236-3.178 4.904l.004 1h23.99l.004-.969c.012-2.688-.092-4.222-3.176-4.935z" />
@@ -100,7 +127,6 @@ export const LoginDetails = () => {
           onChange={(ev) => setEmail(ev.target.value)}
         />
       </div>
-      {/* Password Input */}
       <div className="mb-6 md:mb-8">
         <div className="flex items-center text-lg relative">
           <svg className="absolute ml-3" viewBox="0 0 24 24" width="24">
@@ -118,14 +144,12 @@ export const LoginDetails = () => {
           Forgot password?
         </a>
       </div>
-      {/* Login Button */}
       <button
         onClick={logIn}
         className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded"
       >
         Log In
       </button>
-      {/* Signup Button */}
       <button
         onClick={signUp}
         className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded mt-4"

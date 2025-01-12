@@ -9,7 +9,7 @@ export const AdminNavbar = () => {
         { label: "User Management", href: "/Dashboard" },
         { label: "Voucher Approval", href: "/VoucherApproval" },
         { label: "Inventory", href: "/Inventory" },
-        { label: "Product Request", href: "/Product Request" },
+        { label: "Product Request", href: "/ProductReq" },
       ];
 
   return (

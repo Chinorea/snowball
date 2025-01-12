@@ -18,15 +18,17 @@ interface User {
   id: string;
   username: string;
   email: string;
+  phone: string; // Add phone field
   points: number;
   status: string;
-  usertype: string; // Add usertype field
+  usertype: string;
 }
 
 export const UserManagementPage = () => {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
+    phone: "", // Initialize phone field
     points: 0,
   });
   const [userType, setUserType] = useState("user"); // Default to "user"
@@ -67,12 +69,14 @@ export const UserManagementPage = () => {
   const addUser = async (usertype: string) => {
     try {
       const userCollectionRef = collection(db, "users");
-      const newUserRef = doc(userCollectionRef, newUser.email); 
       const defaultPassword = "12345678";
+      const customId = newUser.email; // Assuming email is unique
+      const newUserRef = doc(userCollectionRef, customId);
 
       await setDoc(newUserRef, {
         username: newUser.username,
         email: newUser.email,
+        phone: newUser.phone, // Add phone field here
         points: newUser.points,
         status: "Active",
         usertype: usertype,
@@ -80,7 +84,7 @@ export const UserManagementPage = () => {
 
       await createUserWithEmailAndPassword(auth, newUser.email, defaultPassword);
 
-      setNewUser({ username: "", email: "", points: 0 });
+      setNewUser({ username: "", email: "", phone: "", points: 0 }); // Reset phone field
       setUserType("user");
       fetchUsers();
       alert("User added successfully!");
@@ -92,7 +96,7 @@ export const UserManagementPage = () => {
 
   // Handle form submission for new user
   const handleAddUser = () => {
-    if (newUser.username && newUser.email && newUser.points) {
+    if (newUser.username && newUser.email && newUser.phone && newUser.points) {
       addUser(userType);
     } else {
       alert("Please fill in all fields.");
@@ -114,10 +118,15 @@ export const UserManagementPage = () => {
     }
   };
 
-  // Reset user password
   const resetPassword = async (userId: string) => {
     try {
-      const newPassword = "temporaryPassword";
+      const newPassword = prompt("Enter the new password:");
+
+      if (!newPassword || newPassword.trim() === "") {
+        alert("Password reset canceled or invalid input provided.");
+        return;
+      }
+
       const userRef = doc(db, "users", userId);
 
       await updateDoc(userRef, { password: newPassword });
@@ -155,6 +164,14 @@ export const UserManagementPage = () => {
           }
         />
         <input
+          type="text"
+          placeholder="Phone Number"
+          value={newUser.phone}
+          onChange={(e) =>
+            setNewUser({ ...newUser, phone: e.target.value })
+          }
+        />
+        <input
           type="number"
           placeholder="Points"
           value={newUser.points}
@@ -180,6 +197,7 @@ export const UserManagementPage = () => {
               <div className="user-info">
                 <p><strong>Username:</strong> {user.username}</p>
                 <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Phone:</strong> {user.phone}</p>
                 <p><strong>Points:</strong> {user.points}</p>
                 <p><strong>Status:</strong> {user.status}</p>
                 <p><strong>Usertype:</strong> {user.usertype}</p>
