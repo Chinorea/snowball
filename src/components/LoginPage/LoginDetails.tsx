@@ -8,6 +8,8 @@ import {
 import { auth, db } from "@/firebase/firebaseConfig";
 import { useState } from "react";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { setCurrentUserEmail } from "../User/userInfo";
+
 
 export const createData = async (
   event: React.MouseEvent<HTMLButtonElement>,
@@ -15,14 +17,18 @@ export const createData = async (
   method: string
 ) => {
   event.preventDefault(); // Prevent form submission
+  const username = email.split("@")[0];
   const userRef = doc(db, "users", email);
   try {
     await setDoc(
       userRef,
       {
         usertype: "User",
-        name: email,
+        email: email,
         loginMethod: method,
+        username: username,
+        points: 0,
+        status: "Active"
       },
       { merge: true }
     );
@@ -32,10 +38,12 @@ export const createData = async (
   }
 };
 
-export const SignUpPage = () => {
+
+export const LoginDetails = () => {
   const router = useRouter(); // Initialize the router
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("");;
+
 
   const logIn = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
@@ -50,7 +58,7 @@ export const SignUpPage = () => {
 
           if (userSnap.exists()) {
             const userType = userSnap.data()?.usertype;
-
+            setCurrentUserEmail(email);
             // Route based on usertype
             if (userType === "Admin") {
               router.push("/Dashboard"); // Navigate to Admin Dashboard
@@ -72,18 +80,7 @@ export const SignUpPage = () => {
 
   const signUp = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
-    try {
-      await createUserWithEmailAndPassword(auth, email, password).then(
-        (userCredential) => {
-          const user = userCredential.user;
-          createData(event, email, "Email");
-          alert("Signed up successfully!");
-        }
-      );
-    } catch (err) {
-      console.error(err);
-      alert(err);
-    }
+    router.push("/SignUpPage");
   };
 
   return (
@@ -115,7 +112,7 @@ export const SignUpPage = () => {
             onChange={(ev) => setPassword(ev.target.value)}
           />
         </div>
-        <a href="#" className="forgot-password-link">
+        <a href="/ForgetPassword" className="forgot-password-link">
           Forgot password?
         </a>
       </div>

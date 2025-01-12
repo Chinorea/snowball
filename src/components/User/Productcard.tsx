@@ -12,6 +12,7 @@ import {
 import { db } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
 import "./style.css"; // Include the CSS file
+import { getCurrentUserEmail } from "./userInfo";
 
 interface Product {
   id: string;
@@ -32,6 +33,7 @@ export const ProductCardPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+
 
   // Fetch products from Firestore
   const fetchProducts = async () => {
@@ -62,8 +64,14 @@ export const ProductCardPage = () => {
 
   // Fetch user points from Firestore
   const fetchUser = async () => {
+    const currentUserEmail = getCurrentUserEmail();
     try {
-      const userDocRef = doc(db, "users", "tester@gmail.com"); // Replace with dynamic user ID
+      //const userDocRef = doc(db, "users", "testing@gmail.com");
+      //alert(currentUserEmail);
+      if(currentUserEmail == null){
+        router.push("");
+      }
+      const userDocRef = doc(db, "users", currentUserEmail);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
