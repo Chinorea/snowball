@@ -5,6 +5,8 @@ import { doc, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { QRCodeSVG } from "qrcode.react";
 import "./style.css";
+import { getCurrentUserEmail } from "./userInfo";
+import { useRouter } from "next/navigation"; 
 
 export const VoucherCard = () => {
   const [vouchers, setVouchers] = useState<any[]>([]); // State to store vouchers
@@ -12,6 +14,7 @@ export const VoucherCard = () => {
   const [error, setError] = useState<string | null>(null); // State to track error
   const [activePopup, setActivePopup] = useState<string | null>(null); // State to track active popup
   const [showQR, setShowQR] = useState<boolean>(false); // State to track QR code visibility
+  const router = useRouter();
 
   // Function to format expiry date
   const formatExpiryDate = (expiryDate: any) => {
@@ -24,8 +27,13 @@ export const VoucherCard = () => {
   // Fetch vouchers from Firestore
   const fetchVouchers = async () => {
     try {
+      const currentUserEmail = getCurrentUserEmail();
       // Reference to the user's document and Vouchers subcollection
-      const userDocRef = doc(db, "users", "tester@gmail.com"); //TODO: bring actual Email
+      if(currentUserEmail == null){
+        router.push("");
+      }
+      console.log(currentUserEmail);
+      const userDocRef = doc(db, "users", currentUserEmail); //TODO: bring actual Email
       const vouchersCollectionRef = collection(userDocRef, "Vouchers");
 
       // Fetch all documents in the Vouchers subcollection
