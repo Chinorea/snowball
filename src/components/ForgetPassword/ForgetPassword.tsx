@@ -6,11 +6,11 @@ import {
 } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useState } from "react";
-import { createData } from "../LoginPage/LoginDetails";
 
 export const ForgetPassword = () => {
   const router = useRouter(); // Initialize the router
   const [email, setEmail] = useState("");
+  // const admin = require("firebase-admin");
 
   const resetPassword = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
@@ -25,7 +25,23 @@ export const ForgetPassword = () => {
       console.error(err);
       alert(err);
     }
+    // sendPasswordResetLink("12345678", email);
   };
+
+  // async function sendPasswordResetLink(phoneNumber: string, email: string) {
+  //   try{
+  //     const resetLink = await admin.auth().generatePasswordResetLink(email);
+  //     sendSms(phoneNumber, resetLink);
+  //     alert("Password reset link sent to your phone number.");
+  //   } catch (error) {
+  //     console.error("Error sending password reset link:", error);
+  //     alert("Error sending password reset link. Please try again later.");
+  //   }
+  // }
+
+  // const sendSms = (phoneNumber: string, message: string) => {
+  //   console.log(`Sending SMS to ${phoneNumber}: ${message}`);
+  // }
 
   return (
     <div>
