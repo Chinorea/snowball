@@ -5,7 +5,7 @@ import { doc, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { QRCodeSVG } from "qrcode.react";
 import "./style.css";
-import { getCurrentUserEmail } from "./userInfo";
+import { getCurrentUserEmail } from "../userInfo";
 import { useRouter } from "next/navigation"; 
 
 export const VoucherCard = () => {

@@ -12,7 +12,7 @@ import {
 import { db } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
 import "./style.css"; // Include the CSS file
-import { getCurrentUserEmail } from "./userInfo";
+import { getCurrentUserEmail } from "../userInfo";
 
 interface Product {
   id: string;
@@ -146,7 +146,6 @@ export const ProductCardPage = () => {
 
   return (
     <div>
-      <h1></h1>
       {user && (
         <div className="user-info">
           <p>

@@ -2,7 +2,7 @@ import { Container } from "@/components/Container";
 import { UserNavbar } from "@/components/User/UserNavBar";
 
 import { benefitOne, benefitTwo } from "@/components/data";
-import { ProductCardPage } from "@/components/User/Productcard";
+import { ProductCardPage } from "@/components/User/Productcard/Productcard";
 
 export default function product() {
   return (

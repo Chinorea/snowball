@@ -192,7 +192,7 @@ export const PreorderPage = () => {
             <strong>Points Per Unit:</strong> {productDetails.pointsPerUnit}
           </p>
         </div>
-        <div className="quantity-input">
+        <div >
           <input
             type="number"
             placeholder="Quantity"

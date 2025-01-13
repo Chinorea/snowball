@@ -59,7 +59,6 @@ export const UserRequestProduct = () => {
 
   return (
     <div className="request-product-container">
-      <h1 className="title">Request a Product</h1>
 
       <div className="request-form">
         <input
