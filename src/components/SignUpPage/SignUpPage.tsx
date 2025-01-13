@@ -18,7 +18,8 @@ export const SignUpPage = () => {
       await createUserWithEmailAndPassword(auth, email, password).then(
         (userCredential) => {
           const user = userCredential.user;
-          createData(event, email, "Email");
+          const authUid = user.uid;
+          createData(event, email, "Email", authUid);
           alert("Signed up successfully!");
           router.push("/");
         }
@@ -58,6 +59,9 @@ export const SignUpPage = () => {
             onChange={(ev) => setPassword(ev.target.value)}
           />
         </div>
+        <a href="/" className="forgot-password-link">
+          Return to Login
+        </a>
       </div>
       {/* Signup Button */}
       <button
@@ -66,6 +70,7 @@ export const SignUpPage = () => {
       >
         Sign Up
       </button>
+
     </div>
   );
 };

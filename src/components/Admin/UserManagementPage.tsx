@@ -7,6 +7,7 @@ import {
   setDoc,
   doc,
   updateDoc,
+  getDoc
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
@@ -69,20 +70,30 @@ export const UserManagementPage = () => {
   const addUser = async (usertype: string) => {
     try {
       const userCollectionRef = collection(db, "users");
-      const defaultPassword = "12345678";
+      const defaultPassword = "newPassword";
       const customId = newUser.email; // Assuming email is unique
       const newUserRef = doc(userCollectionRef, customId);
 
-      await setDoc(newUserRef, {
-        username: newUser.username,
-        email: newUser.email,
-        phone: newUser.phone, // Add phone field here
-        points: newUser.points,
-        status: "Active",
-        usertype: usertype,
-      });
-
-      await createUserWithEmailAndPassword(auth, newUser.email, defaultPassword);
+      try {
+        await createUserWithEmailAndPassword(auth, newUser.email, defaultPassword).then(
+          (userCredential) => {
+            const user = userCredential.user;
+            const authUid = user.uid;
+            setDoc(newUserRef, {
+              username: newUser.username,
+              email: newUser.email,
+              phone: newUser.phone, // Add phone field here
+              points: newUser.points,
+              status: "Active",
+              usertype: usertype,
+              uid: authUid
+            });
+          }
+        );
+      } catch (err) {
+        console.error(err);
+        alert(err);
+      }
 
       setNewUser({ username: "", email: "", phone: "", points: 0 }); // Reset phone field
       setUserType("user");
@@ -127,9 +138,40 @@ export const UserManagementPage = () => {
         return;
       }
 
-      const userRef = doc(db, "users", userId);
+      const updatedPassword = {password: newPassword }
 
-      await updateDoc(userRef, { password: newPassword });
+      const userRef = doc(db, "users", userId);
+      const docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        const targetAuthUID = docSnap.data().uid;
+
+        //Calls API to reset password of account.
+        try {
+          console.log(targetAuthUID);
+          console.log(updatedPassword);
+          const response = await fetch('http://localhost:3000/api/updateUser', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              uid: targetAuthUID,
+              updateData: updatedPassword, // This should be the update payload
+            }),
+          });
+      
+          const result = await response.json();
+          console.log('User update result:', result);
+        } catch (error) {
+          console.error('Error updating user:', error);
+        }
+      } else {
+        console.log("No such document!");
+        return;
+      }
+      
+
 
       alert("Password reset successfully.");
     } catch (err) {
