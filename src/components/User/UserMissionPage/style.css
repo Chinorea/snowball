@@ -79,3 +79,23 @@
     background-color: #0056b3;
   }
   
+  .enrolled-missions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mission-logs-button {
+    background-color: #4a90e2;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .mission-logs-button:hover {
+    background-color: #357abd;
+  }

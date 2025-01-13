@@ -66,7 +66,7 @@ export const ProductCardPage = () => {
     const currentUserEmail = getCurrentUserEmail();
     try {
       if (!currentUserEmail) {
-        router.push("/Login");
+        router.push("/");
       }
       const userDocRef = doc(db, "users", currentUserEmail);
       const userDoc = await getDoc(userDocRef);
