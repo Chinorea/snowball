@@ -91,6 +91,28 @@ export const LoginDetails = () => {
     router.push("/SignUpPage");
   };
 
+  const testAdminSDK = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // Prevent form submission
+    const testUserUID = "zHthVgGVqNeosHMGY0LFBobV0Ei2";
+    fetchUser(testUserUID);
+  };
+
+  const fetchUser = async (uid: string) => {
+  
+    try {
+      console.log("testing fetch")
+      const response = await fetch(`/api/getUser?uid=${uid}`);
+      console.log("response: " + response);
+      if (!response.ok){
+        console.log("response not ok");
+      } throw new Error('Failed to fetch user');
+      const data = await response.json();
+      console.log("UserData" + data);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  }
+
   const handleReturnToLogin = () => {
     setIsSuspended(false); // Close the popup
     router.push("/"); // Redirect to the login page
@@ -155,6 +177,12 @@ export const LoginDetails = () => {
         className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded mt-4"
       >
         Sign Up
+      </button>
+      <button
+        onClick={testAdminSDK}
+        className="bg-gray-700 dark:bg-gray-800 font-medium p-2 md:p-4 text-white uppercase w-full rounded"
+      >
+        testAdminSDK
       </button>
     </div>
   );
