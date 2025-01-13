@@ -1,12 +1,13 @@
 import { AdminNavbar } from "@/components/Admin/AdminNavBar";
-import { InventoryManagement } from "@/components/Admin/InventoryManagement/InventoryManagement";
+import { AuditLogsPage } from "@/components/Admin/InventoryManagement/AuditLogsPage/AuditLogsPage";
+
 import { Container } from "@/components/Container";
 
-export default function Inventory() {
+export default function auditlogs() {
   return (
     <Container>
         <AdminNavbar /> 
-        <InventoryManagement />
+        <AuditLogsPage />
     </Container>
   );
 }

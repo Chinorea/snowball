@@ -1,0 +1,110 @@
+/* General container styling */
+.preorder-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Header styling */
+.preorder-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Table styling */
+.preorder-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.preorder-table th,
+.preorder-table td {
+  border: 1px solid #ddd;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.preorder-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  color: #555;
+}
+
+.preorder-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.preorder-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Empty state styling */
+.preorder-list p {
+  text-align: center;
+  font-size: 16px;
+  color: #888;
+}
+
+/* Buttons styling */
+.action-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.action-button.approve {
+  background-color: #4caf50;
+  color: white;
+}
+
+.action-button.approve:hover {
+  background-color: #45a049;
+}
+
+.action-button.reject {
+  background-color: #f44336;
+  color: white;
+}
+
+.action-button.reject:hover {
+  background-color: #e53935;
+}
+
+.action-button.fulfill {
+  background-color: #2196f3;
+  color: white;
+}
+
+.action-button.fulfill:hover {
+  background-color: #1976d2;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .preorder-container {
+    padding: 10px;
+  }
+
+  .preorder-table th,
+  .preorder-table td {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .action-button {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}

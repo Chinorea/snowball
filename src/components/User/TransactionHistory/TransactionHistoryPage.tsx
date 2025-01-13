@@ -5,7 +5,7 @@ import { collection, getDocs, doc, Timestamp } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import "./style.css";
-import { getCurrentUserEmail, getIsAdmin } from "./userInfo";
+import { getCurrentUserEmail, getIsAdmin } from "../userInfo";
 
 interface Transaction {
   id: string;

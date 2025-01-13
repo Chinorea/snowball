@@ -1,14 +1,12 @@
 import { Container } from "@/components/Container";
 import { UserNavbar } from "@/components/User/UserNavBar";
-
-import { benefitOne, benefitTwo } from "@/components/data";
-import { ProductCardPage } from "@/components/User/Productcard/Productcard";
+import { MissionLogsPage } from "@/components/User/UserMissionPage/MissionLogPage/MissionLogPage";
 
 export default function product() {
   return (
     <Container>
         <UserNavbar /> 
-        <ProductCardPage />
+        <MissionLogsPage />
     </Container>
   );
 }

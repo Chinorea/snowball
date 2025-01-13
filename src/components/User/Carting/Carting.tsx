@@ -1,27 +1,39 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, doc, getDoc, writeBatch, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  writeBatch,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { VoucherList } from "./VoucherList";
 import "./style.css";
+import { getCurrentUserEmail } from "../userInfo";
 
 export const Carting = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [selectedVoucher, setSelectedVoucher] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
-  const [startingPoints, setStartingPoints] = useState<number>(0);
-  const [calculatedRemainingPoints, setCalculatedRemainingPoints] = useState<number | null>(null);
-  const router = useRouter();
 
-  // Function to fetch cart items and user points
+  const [startingPoints, setStartingPoints] = useState<number>(0);
+  const [calculatedRemainingPoints, setCalculatedRemainingPoints] =
+    useState<number | null>(null);
+
+  const router = useRouter();
+  const CurrentUserEmail = getCurrentUserEmail();
+
   const fetchCartItemsAndPoints = async () => {
     try {
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartCollectionRef = collection(userDocRef, "CartList");
 
-      // Fetch cart items
       const cartSnapshot = await getDocs(cartCollectionRef);
       const items = cartSnapshot.docs.map((doc) => {
         const data = doc.data();
@@ -36,12 +48,11 @@ export const Carting = () => {
 
       setCartItems(items);
 
-      // Fetch user points
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
         const userData = userDoc.data();
         setStartingPoints(parseInt(userData.points));
-        calculateRemainingPoints(parseInt(userData.points), items); // Calculate remaining points
+        calculateRemainingPoints(parseInt(userData.points), items);
       }
     } catch (error) {
       console.error("Error fetching cart items or user points:", error);
@@ -52,7 +63,6 @@ export const Carting = () => {
     fetchCartItemsAndPoints();
   }, []);
 
-  // Calculate remaining points before transaction
   const calculateRemainingPoints = (userPoints: number, items: any[]) => {
     const totalPointsRequired = items.reduce(
       (total, item) => total + item.pointsRequired * item.quantity,
@@ -61,21 +71,17 @@ export const Carting = () => {
     setCalculatedRemainingPoints(userPoints - totalPointsRequired);
   };
 
-  // Handle quantity change
   const handleQuantityChange = async (id: string, newQuantity: number) => {
     try {
-      // Update local state
       const updatedItems = cartItems.map((item) =>
         item.id === id ? { ...item, quantity: newQuantity } : item
       );
 
       setCartItems(updatedItems);
 
-      // Recalculate remaining points
       calculateRemainingPoints(startingPoints, updatedItems);
 
-      // Update Firestore
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartDocRef = doc(userDocRef, "CartList", id);
       await updateDoc(cartDocRef, { quantity: newQuantity });
     } catch (error) {
@@ -83,19 +89,15 @@ export const Carting = () => {
     }
   };
 
-  // Remove item from the cart
   const handleRemoveItem = async (id: string) => {
     try {
-      // Update local state
       const updatedItems = cartItems.filter((item) => item.id !== id);
 
       setCartItems(updatedItems);
 
-      // Recalculate remaining points
       calculateRemainingPoints(startingPoints, updatedItems);
 
-      // Remove from Firestore
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartDocRef = doc(userDocRef, "CartList", id);
       await deleteDoc(cartDocRef);
     } catch (error) {
@@ -103,13 +105,11 @@ export const Carting = () => {
     }
   };
 
-  // Handle the checkout process
   const handleCheckout = async () => {
     try {
       const batch = writeBatch(db);
-      const userDocRef = doc(db, "users", "tester@gmail.com");
+      const userDocRef = doc(db, "users", CurrentUserEmail);
 
-      // Fetch user data
       const userDoc = await getDoc(userDocRef);
       if (!userDoc.exists()) {
         alert("User not found.");
@@ -120,7 +120,6 @@ export const Carting = () => {
 
       let totalPointsSpent = 0;
 
-      // Validate stock and calculate points spent
       for (const item of cartItems) {
         const productRef = doc(db, "Products", item.id);
         const productDoc = await getDoc(productRef);
@@ -131,12 +130,10 @@ export const Carting = () => {
             const pointsSpentOnItem = item.pointsRequired * item.quantity;
             totalPointsSpent += pointsSpentOnItem;
 
-            // Reduce stock for purchased items
             batch.update(productRef, {
               Stock: productData.Stock - item.quantity,
             });
 
-            // Add transaction
             const transactionRef = collection(userDocRef, "transactions");
             await setDoc(doc(transactionRef), {
               productId: item.id,
@@ -147,7 +144,6 @@ export const Carting = () => {
               voucher: selectedVoucher,
             });
 
-            // Remove item from cart
             const cartDocRef = doc(userDocRef, "CartList", item.id);
             batch.delete(cartDocRef);
           } else {
@@ -157,17 +153,14 @@ export const Carting = () => {
         }
       }
 
-      // Check if user has enough points
       if (userPoints < totalPointsSpent) {
         alert("Not enough points for this transaction.");
         return;
       }
 
-      // Deduct points and update Firestore
       userPoints -= totalPointsSpent;
       batch.update(userDocRef, { points: userPoints.toString() });
 
-      // Commit batch
       await batch.commit();
 
       alert("Transaction successful!");
@@ -187,57 +180,86 @@ export const Carting = () => {
       </div>
       <div className="cart-items">
         <h5>Your Cart Items</h5>
+        <div className="cart-item-header">
+          <div className="itemheader1">Item</div>
+          <div className="itemheader2">Stock</div>
+          <div className="itemheader3">Points Required</div>
+          <div className="itemheader4">Quantity</div>
+          <div className="itemheader5">Remove</div>
+        </div>
         {cartItems.map((item) => (
           <div className="cart-item" key={item.id}>
             <div className="cart-item-details">
               <h4>{item.name}</h4>
-              <p>Stock: {item.stock}</p>
-              <p>Points Required: {item.pointsRequired}</p>
+              <p>{item.stock}</p>
+              <p>{item.pointsRequired}</p>
+              <div className="quantity-container">
+                <button
+                  className="quantity-btn"
+                  onClick={() =>
+                    handleQuantityChange(
+                      item.id,
+                      Math.max(1, item.quantity - 1)
+                    )
+                  }
+                  disabled={item.quantity <= 1}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={item.quantity}
+                  min="1"
+                  max={item.stock}
+                  onChange={(e) =>
+                    handleQuantityChange(item.id, parseInt(e.target.value))
+                  }
+                  className="quantity-input"
+                />
+                <button
+                  className="quantity-btn"
+                  onClick={() =>
+                    handleQuantityChange(
+                      item.id,
+                      Math.min(item.stock, item.quantity + 1)
+                    )
+                  }
+                  disabled={item.quantity >= item.stock}
+                >
+                  +
+                </button>
+                <button
+                className="remove-item-btn"
+                onClick={() => handleRemoveItem(item.id)}
+              >
+                ×
+              </button>
+              </div>
             </div>
-            <div className="quantity-selector">
-              <input
-                type="number"
-                value={item.quantity}
-                min="1"
-                max={item.stock}
-                onChange={(e) =>
-                  handleQuantityChange(item.id, parseInt(e.target.value))
-                }
-              />
-            </div>
-            <button
-              className="remove-item-btn"
-              onClick={() => handleRemoveItem(item.id)}
-            >
-              ×
-            </button>
           </div>
         ))}
       </div>
-
       <div className="voucher-section">
         <h5>Select Voucher</h5>
         <VoucherList setSelectedVoucher={setSelectedVoucher} />
       </div>
-
-       <p>
-          Remaining Points (Before Transaction):{" "}
-          {calculatedRemainingPoints !== null
-            ? calculatedRemainingPoints
-            : "Calculating..."}
-        </p>
-
-        <div className="checkout-btn-container">
-            <button
-                className={`checkout-btn ${cartItems.length === 0 ? "disabled-btn" : ""}`}
-                onClick={handleCheckout}
-                disabled={cartItems.length === 0} // Disable button if cart is empty
-            >
-                Confirm Purchase
-            </button>
-            
-        </div>
-
+      <p>
+        Remaining Points (Before Transaction):{" "}
+        {calculatedRemainingPoints !== null
+          ? calculatedRemainingPoints
+          : "Calculating..."}
+      </p>
+      <div className="checkout-btn-container">
+        <button
+          className={`checkout-btn ${
+            cartItems.length === 0 ? "disabled-btn" : ""
+          }`}
+          onClick={handleCheckout}
+          disabled={cartItems.length === 0}
+        >
+          Confirm Purchase
+        </button>
+      </div>
     </div>
   );
 };

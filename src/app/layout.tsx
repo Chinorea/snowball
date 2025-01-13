@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body >
         {/* <ThemeProvider attribute="class" defaultTheme="dark" > */}
           {/* Dynamic background based on the route */}
           {/* <div className={isHomePage ? "bg-indigo-200 dark:bg-purple-800 min-h-screen w-full" : "bg-white min-h-screen w-full"}> */}

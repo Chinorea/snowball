@@ -5,7 +5,7 @@ import { doc, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { QRCodeSVG } from "qrcode.react";
 import "./style.css";
-import { getCurrentUserEmail, getIsAdmin } from "./userInfo";
+import { getCurrentUserEmail, getIsAdmin } from "../userInfo";
 import { useRouter } from "next/navigation";
 
 export const VoucherCard = () => {
@@ -86,7 +86,7 @@ export const VoucherCard = () => {
   // Render voucher cards
   return (
     <div>
-      <h1>Vouchers</h1>
+      <h1></h1>
       <div className="voucher-container">
         {vouchers.length > 0 ? (
           vouchers.map((voucher) => (

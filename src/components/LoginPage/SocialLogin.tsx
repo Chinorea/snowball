@@ -10,7 +10,7 @@ import { doc, getDoc } from "firebase/firestore";
 export const SocialLogin = () => {
     const router = useRouter(); // Initialize the router
     
-    const redirectUser = async (event: React.MouseEvent<HTMLButtonElement>, email: string) => {
+    const redirectUser = async (event: React.MouseEvent<HTMLButtonElement>, email: string, uid: string) => {
           const userRef = doc(db, "users", email);
           const userSnap = await getDoc(userRef);
 
@@ -28,7 +28,7 @@ export const SocialLogin = () => {
               alert("Invalid usertype. Please contact support.");
             }
           } else {
-            createData(event, email, "Google")
+            createData(event, email, "Google", uid)
             setIsUser();
             router.push("/Product");
           }
@@ -47,11 +47,12 @@ export const SocialLogin = () => {
           // The signed-in user info.
           const user = result.user;
           const email = user.email
+          const authUid = user.uid;
           if(email == null){
             return;
           }
           setCurrentUserEmail(email);
-          redirectUser(event, email);
+          redirectUser(event, email, authUid);
         }).catch((error) => {
           // Handle Errors here.
           const errorCode = error.code;

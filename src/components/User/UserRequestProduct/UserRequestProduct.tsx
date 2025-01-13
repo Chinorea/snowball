@@ -1,18 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { db } from "@/firebase/firebaseConfig"; // Adjust the path to your Firebase config
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import "./style.css"; // Import the CSS file
 
 export const UserRequestProduct = () => {
   const [productName, setProductName] = useState("");
-  const [productQuantity, setProductQuantity] = useState(1); // New state for quantity
+  const [productQuantity, setProductQuantity] = useState(1);
   const [requestedProducts, setRequestedProducts] = useState<
     { id: string; Name: string; Amount: number }[]
   >([]);
@@ -22,9 +16,9 @@ export const UserRequestProduct = () => {
     try {
       const querySnapshot = await getDocs(collection(db, "Requested Product"));
       const products = querySnapshot.docs.map((doc) => ({
-        id: doc.id, // Firestore document ID
-        Name: doc.data().Name, // Product name
-        Amount: doc.data().Amount, // Product quantity
+        id: doc.id,
+        Name: doc.data().Name,
+        Amount: doc.data().Amount,
       }));
       setRequestedProducts(products);
     } catch (error) {
@@ -45,28 +39,14 @@ export const UserRequestProduct = () => {
     }
 
     try {
-      // Check if the product already exists in the list
-    //   const existingProduct = requestedProducts.find(
-    //     (product) => product.Name.toLowerCase() === productName.toLowerCase()
-    //   );
+      await addDoc(collection(db, "Requested Product"), {
+        Name: productName,
+        Amount: productQuantity,
+      });
 
-    //   if (existingProduct) {
-    //     // Update the existing product's amount
-    //     const productRef = doc(db, "Requested Product", existingProduct.id);
-    //     await updateDoc(productRef, {
-    //       Amount: existingProduct.Amount + productQuantity,
-    //     });
-    //   } else {
-        // Add a new product to the Firestore collection
-        await addDoc(collection(db, "Requested Product"), {
-          Name: productName,
-          Amount: productQuantity,
-        });
-    //   }
-
-      setProductName(""); // Clear the product name input field
-      setProductQuantity(1); // Reset the quantity to 1
-      fetchRequestedProducts(); // Refresh the product list
+      setProductName("");
+      setProductQuantity(1);
+      fetchRequestedProducts();
     } catch (error) {
       console.error("Error requesting product:", error);
     }
@@ -79,9 +59,7 @@ export const UserRequestProduct = () => {
 
   return (
     <div className="request-product-container">
-      <h1 className="title">Request a Product</h1>
 
-      {/* Input for requesting a product */}
       <div className="request-form">
         <input
           type="text"
@@ -103,7 +81,6 @@ export const UserRequestProduct = () => {
         </button>
       </div>
 
-      {/* Table of requested products */}
       <h2 className="subtitle">Already Requested Products</h2>
       <table className="product-table">
         <thead>

@@ -1,12 +1,12 @@
 import { AdminNavbar } from "@/components/Admin/AdminNavBar";
-import { InventoryManagement } from "@/components/Admin/InventoryManagement/InventoryManagement";
+import { VoucherCreationPage } from "@/components/Admin/VoucherCreationPage/VoucherCreationPage";
 import { Container } from "@/components/Container";
 
-export default function Inventory() {
+export default function CreateVoucher() {
   return (
     <Container>
         <AdminNavbar /> 
-        <InventoryManagement />
+        <VoucherCreationPage />
     </Container>
   );
 }

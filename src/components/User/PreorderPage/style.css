@@ -1,0 +1,133 @@
+.preorder-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 25px;
+    background-color: #f9f9f9; /* Light background */
+    border-radius: 10px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    color: #333333; /* Dark text color */
+    font-family: Arial, sans-serif;
+}
+
+.preorder-header {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 25px;
+    color: #4a4a4a; /* Dark gray heading */
+    text-align: center;
+}
+
+.add-preorder {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #ffffff; /* White background for pre-order section */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-preorder h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333333; /* Dark heading text */
+    margin-bottom: 15px;
+}
+
+.product-details p,
+.points-summary p {
+    font-size: 16px;
+    margin: 10px 0;
+    color: #555555; /* Medium gray text */
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #cccccc; /* Light gray border */
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.add-preorder-button {
+    padding: 12px 24px;
+    background-color: #007bff; /* Blue button */
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.add-preorder-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.points-summary {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9; /* Light gray background */
+    border: 1px solid #e0e0e0; /* Soft border */
+    border-radius: 8px;
+}
+
+.points-summary h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #4a4a4a; /* Dark gray heading */
+}
+
+.preorder-list h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4a4a4a; /* Dark gray heading */
+    margin-bottom: 15px;
+}
+
+.preorder-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #ffffff; /* White background */
+}
+
+.preorder-table th,
+.preorder-table td {
+    border: 1px solid #e0e0e0; /* Light gray border */
+    padding: 12px 15px;
+    text-align: left;
+    color: #333333; /* Dark text */
+}
+
+.preorder-table th {
+    background-color: #f2f2f2; /* Light gray heading background */
+    font-weight: bold;
+    font-size: 16px;
+    color: #4a4a4a;
+}
+
+.preorder-table td {
+    font-size: 15px;
+    color: #555555; /* Medium gray text */
+}
+
+.preorder-table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Alternate row background */
+}
+
+.preorder-table tr:hover {
+    background-color: #e0e0e0; /* Light gray hover effect */
+}
+
+.no-preorders {
+    text-align: center;
+    font-size: 16px;
+    color: #777777; /* Soft gray text */
+    margin-top: 15px;
+}

@@ -13,7 +13,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
 import "./style.css"; // Include the CSS file
-import { getCurrentUserEmail, getIsAdmin } from "../User/userInfo";
+import { getCurrentUserEmail, getIsAdmin } from "@/components/User/userInfo";
 
 interface User {
   id: string;
@@ -129,6 +129,7 @@ export const UserManagementPage = () => {
     }
   };
 
+  // Reset Password
   const resetPassword = async (userId: string) => {
     try {
       const newPassword = prompt("Enter the new password:");
@@ -177,6 +178,37 @@ export const UserManagementPage = () => {
     } catch (err) {
       console.error("Error resetting password:", err);
       alert("Failed to reset password. Please try again.");
+    }
+  };
+
+  // Edit Points
+  const editUserPoints = async (userId: string, currentPoints: number) => {
+    try {
+      const newPoints = prompt(
+        `Enter new points for the user (current points: ${currentPoints}):`
+      );
+
+      if (newPoints === null || newPoints.trim() === "") {
+        alert("Points update canceled or invalid input provided.");
+        return;
+      }
+
+      const parsedPoints = parseInt(newPoints.trim(), 10);
+
+      if (isNaN(parsedPoints) || parsedPoints < 0) {
+        alert("Please enter a valid positive number for points.");
+        return;
+      }
+
+      const userRef = doc(db, "users", userId);
+
+      await updateDoc(userRef, { points: parsedPoints });
+
+      fetchUsers();
+      alert("Points updated successfully.");
+    } catch (err) {
+      console.error("Error updating points:", err);
+      alert("Failed to update points. Please try again.");
     }
   };
 
@@ -251,7 +283,16 @@ export const UserManagementPage = () => {
                 >
                   {user.status === "Active" ? "Suspend" : "Activate"}
                 </button>
-                <button className="reset-password-button" onClick={() => resetPassword(user.id)}>
+                <button
+                  className="edit-points-button"
+                  onClick={() => editUserPoints(user.id, user.points)}
+                >
+                  Edit Points
+                </button>
+                <button
+                  className="reset-password-button"
+                  onClick={() => resetPassword(user.id)}
+                >
                   Reset Password
                 </button>
               </div>
