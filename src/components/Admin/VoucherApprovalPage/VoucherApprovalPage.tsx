@@ -5,8 +5,8 @@ import {
   collection,
   getDocs,
   addDoc,
-  updateDoc,
   deleteDoc,
+  updateDoc,
   doc,
   increment,
 } from "firebase/firestore";
@@ -17,6 +17,14 @@ interface Voucher {
   VoucherID: string;
   Description: string;
   ExpiryDate: string;
+  pointsOrPercent: number | 0;
+  voucherType:string;
+}
+
+interface Reward {
+  type: String;
+  voucher: Voucher | null;
+  amount: number;
 }
 
 interface Mission {
@@ -26,16 +34,26 @@ interface Mission {
   completionDate: string;
   expiryDate: string;
   pointsWorth?: number;
+  reward?: Reward;
   voucher?: Voucher | null;
   userId?: string;
   username?: string;
-  status?: string;
 }
 
 export const VoucherApprovalPage = () => {
   const [missions, setMissions] = useState<Mission[]>([]);
   const [userMissions, setUserMissions] = useState<Mission[]>([]);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [newMission, setNewMission] = useState<Mission>({
+    id: "",
+    title: "",
+    details: "",
+    completionDate: "",
+    expiryDate: "",
+    
+  });
+  const [rewardType, setRewardType] = useState<"points" | "voucher">("points");
+  const [showCreateMissionModal, setShowCreateMissionModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,41 +125,94 @@ export const VoucherApprovalPage = () => {
     }
   };
 
+  const handleCreateMission = async () => {
+    if (
+      !newMission.title.trim() ||
+      !newMission.details.trim() ||
+      !newMission.completionDate.trim() ||
+      !newMission.expiryDate.trim()
+    ) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      const missionsCollectionRef = collection(db, "missions");
+      await addDoc(missionsCollectionRef, {
+        title: newMission.title,
+        details: newMission.details,
+        completionDate: newMission.completionDate,
+        expiryDate: newMission.expiryDate,
+        pointsWorth: rewardType === "points" ? newMission.pointsWorth : null,
+        voucher: rewardType === "voucher" ? newMission.voucher : null,
+      });
+
+      alert("Mission created successfully!");
+      setNewMission({
+        id: "",
+        title: "",
+        details: "",
+        completionDate: "",
+        expiryDate: "",
+      });
+      setShowCreateMissionModal(false);
+      fetchMissions();
+    } catch (err) {
+      console.error("Error creating mission:", err);
+      alert("Failed to create mission. Please try again.");
+    }
+  };
+
+  const handleRemoveMission = async (missionId: string) => {
+    try {
+      const missionRef = doc(db, "missions", missionId);
+      await deleteDoc(missionRef);
+      alert("Mission removed successfully!");
+      fetchMissions();
+    } catch (err) {
+      console.error("Error removing mission:", err);
+      alert("Failed to remove mission. Please try again.");
+    }
+  };
+
   const approveUserMission = async (userId: string, mission: Mission) => {
     try {
+      // console.log(mission)
       // Reward the user
-      if (mission.pointsWorth) {
-        // Update the user's points
+      if (mission.reward?.type == "points") {
         const userRef = doc(db, "users", userId);
-        await updateDoc(userRef, { points: increment(mission.pointsWorth) });
-      } else if (mission) {
-        // Add the voucher to the user's Vouchers collection
+        await updateDoc(userRef, { points: increment(mission.reward.amount) });
+      } else if (mission.reward?.voucher) {
         const userVouchersRef = collection(db, "users", userId, "Vouchers");
         await addDoc(userVouchersRef, {
-          Description: mission.title,
-          ExpiryDate: mission.expiryDate,
-          VoucherID: mission.id
+          VoucherID: mission.reward?.voucher?.VoucherID,
+          Description: mission.reward?.voucher?.Description,
+          ExpiryDate: mission.reward?.voucher?.ExpiryDate,
+          PointORpercent: mission.reward?.voucher?.pointsOrPercent,
+          voucherType: mission.reward?.voucher?.voucherType
         });
       }
 
-
-      // Add the mission to the user's mission logs
       const missionLogsRef = collection(db, "users", userId, "missionlogs");
       await addDoc(missionLogsRef, {
         title: mission.title,
         details: mission.details,
         completionDate: mission.completionDate,
         expiryDate: mission.expiryDate,
-        pointsEarned: mission.pointsWorth || null,
-        voucherEarned: mission.voucher || null,
+        typeOfReward: mission.reward?.type,
+        pointsEarned: mission.reward?.amount || null,
+        voucherEarned: mission.reward?.voucher || null,
         approvedAt: new Date().toISOString(),
+        userId,
+        username: mission.username,
       });
 
-      // Remove the mission from the enrolledMissions
+
+      // Remove the mission from enrolled missions
       const enrolledMissionRef = doc(db, "users", userId, "enrolledMissions", mission.id);
       await deleteDoc(enrolledMissionRef);
 
-      alert("Mission approved and rewards granted!");
+      alert(`Mission approved and rewards granted to ${mission.username || "Unknown User"}!`);
       fetchUserMissions();
     } catch (err) {
       console.error("Error approving mission:", err);
@@ -156,6 +227,7 @@ export const VoucherApprovalPage = () => {
     <div className="mission-management-container">
       <div className="header-with-button">
         <h1>Voucher Approval - Mission Management</h1>
+        <button onClick={() => setShowCreateMissionModal(true)}>Add New Mission</button>
       </div>
 
       <div className="user-missions-section">
@@ -173,18 +245,16 @@ export const VoucherApprovalPage = () => {
           <tbody>
             {userMissions.map((mission) => (
               <tr key={mission.id}>
-                <td>{mission.username}</td>
+                <td>{mission.username || "Unknown User"}</td>
                 <td>{mission.title}</td>
                 <td>{mission.details}</td>
                 <td>
-                  {mission.pointsWorth
-                    ? `${mission.pointsWorth} Points`
-                    : mission.voucher?.Description || "N/A"}
+                  {mission.reward?.type == "points"
+                    ? `${mission.reward.amount} Points`
+                    : mission.reward?.voucher?.Description || "N/A"}
                 </td>
                 <td>
-                  <button
-                    onClick={() => approveUserMission(mission.userId!, mission)}
-                  >
+                  <button onClick={() => approveUserMission(mission.userId!, mission)}>
                     Approve
                   </button>
                 </td>
@@ -204,6 +274,7 @@ export const VoucherApprovalPage = () => {
               <th>Completion Date</th>
               <th>Expiry Date</th>
               <th>Reward</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -218,11 +289,102 @@ export const VoucherApprovalPage = () => {
                     ? `${mission.pointsWorth} Points`
                     : mission.voucher?.Description || "N/A"}
                 </td>
+                <td>
+                  <button onClick={() => handleRemoveMission(mission.id)}>Remove</button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {showCreateMissionModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Create New Mission</h2>
+            <div>
+              <label>Title:</label>
+              <input
+                type="text"
+                value={newMission.title}
+                onChange={(e) => setNewMission({ ...newMission, title: e.target.value })}
+              />
+            </div>
+            <div>
+              <label>Details:</label>
+              <textarea
+                value={newMission.details}
+                onChange={(e) => setNewMission({ ...newMission, details: e.target.value })}
+              />
+            </div>
+            <div>
+              <label>Completion Date:</label>
+              <input
+                type="date"
+                value={newMission.completionDate}
+                onChange={(e) =>
+                  setNewMission({ ...newMission, completionDate: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label>Expiry Date:</label>
+              <input
+                type="date"
+                value={newMission.expiryDate}
+                onChange={(e) =>
+                  setNewMission({ ...newMission, expiryDate: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label>Reward Type:</label>
+              <select
+                value={rewardType}
+                onChange={(e) => setRewardType(e.target.value as "points" | "voucher")}
+              >
+                <option value="points">Points</option>
+                <option value="voucher">Voucher</option>
+              </select>
+            </div>
+            {rewardType === "points" && (
+              <div>
+                <label>Points Worth:</label>
+                <input
+                  type="number"
+                  value={newMission.pointsWorth || ""}
+                  onChange={(e) =>
+                    setNewMission({ ...newMission, pointsWorth: Number(e.target.value) })
+                  }
+                />
+              </div>
+            )}
+            {rewardType === "voucher" && (
+              <div>
+                <label>Select Voucher:</label>
+                <select
+                  value={newMission.voucher?.VoucherID || ""}
+                  onChange={(e) =>
+                    setNewMission({
+                      ...newMission,
+                      voucher: vouchers.find((v) => v.VoucherID === e.target.value) || null,
+                    })
+                  }
+                >
+                  <option value="">Select a Voucher</option>
+                  {vouchers.map((voucher) => (
+                    <option key={voucher.VoucherID} value={voucher.VoucherID}>
+                      {voucher.Description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <button onClick={handleCreateMission}>Create Mission</button>
+            <button onClick={() => setShowCreateMissionModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

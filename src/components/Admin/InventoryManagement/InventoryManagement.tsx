@@ -22,7 +22,7 @@ export const InventoryManagement = () => {
     PointsRequired: "",
     Stock: "",
   });
-  const [editProduct, setEditProduct] = useState<any>(null); // For editing modal
+  const [editProduct, setEditProduct] = useState<any>(null);
 
   // Fetch all products from Firestore
   const fetchProducts = async () => {
@@ -43,23 +43,46 @@ export const InventoryManagement = () => {
     }
   };
 
-  // Add new product to Firestore
+  // Add a new product to Firestore
   const handleAddProduct = async () => {
     if (!newProduct.Name || !newProduct.PointsRequired || !newProduct.Stock) {
       alert("Please fill in all fields.");
       return;
     }
-  
+
     try {
-      const productRef = doc(db, "Products", newProduct.Name); // Use the product name as the document ID
+      const productRef = doc(db, "Products", newProduct.Name);
       await setDoc(productRef, {
         PointsRequired: newProduct.PointsRequired,
         Stock: newProduct.Stock,
       });
-      fetchProducts(); // Refresh the product list
+
+      // Log the add action
+      await logAudit("Add", newProduct.Name, parseInt(newProduct.Stock));
+
+      fetchProducts(); // Refresh product list
       setNewProduct({ Name: "", PointsRequired: "", Stock: "" }); // Reset form
     } catch (error) {
       console.error("Error adding product:", error);
+    }
+  };
+
+  // Log changes to Firestore
+  const logAudit = async (
+    action: string,
+    product: string,
+    amount: number | null
+  ) => {
+    try {
+      const auditRef = collection(db, "InventoryAudit");
+      await addDoc(auditRef, {
+        action,
+        product,
+        amount,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error logging audit:", error);
     }
   };
 
@@ -69,10 +92,21 @@ export const InventoryManagement = () => {
 
     try {
       const productRef = doc(db, "Products", editProduct.id);
+      const oldProduct = products.find((p) => p.id === editProduct.id);
+      const stockChange =
+        editProduct.Stock - (oldProduct ? oldProduct.Stock : 0);
+
       await updateDoc(productRef, {
         PointsRequired: editProduct.PointsRequired,
         Stock: editProduct.Stock,
       });
+
+      // Log the edit action
+      if (stockChange !== 0) {
+        const action = stockChange > 0 ? "Increase" : "Decrease";
+        await logAudit(action, editProduct.id, Math.abs(stockChange));
+      }
+
       setEditProduct(null); // Close the modal
       fetchProducts(); // Refresh the product list
     } catch (error) {
@@ -85,6 +119,10 @@ export const InventoryManagement = () => {
     try {
       const productRef = doc(db, "Products", id);
       await deleteDoc(productRef);
+
+      // Log the delete action
+      await logAudit("Delete", id, null);
+
       fetchProducts(); // Refresh the product list
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -103,7 +141,15 @@ export const InventoryManagement = () => {
 
   return (
     <div className="inventory-container">
-      <h1 className="title">Inventory Management</h1>
+      <div className="inventory-header">
+        <h1 className="title">Inventory Management</h1>
+        <button
+          className="audit-logs-button"
+          onClick={() => (window.location.href = "/Inventory/auditlogs")}
+        >
+          View Audit Logs
+        </button>
+      </div>
 
       {/* Add Product Form */}
       <div className="add-product-form">

@@ -9,31 +9,32 @@ interface Voucher {
   VoucherID: string;
   Description: string;
   ExpiryDate: string;
-  Requirement: string;
-  RequirementTag: string;
+  VoucherType: "pointDeduction" | "percentDeduction";
+  Amount: number;
 }
 
 export const VoucherCreationPage = () => {
-  const [newVoucher, setNewVoucher] = useState<Voucher>({
-    VoucherID: "",
+  const [newVoucher, setNewVoucher] = useState<Omit<Voucher, "VoucherID">>({
     Description: "",
     ExpiryDate: "",
-    Requirement: "",
-    RequirementTag: "",
+    VoucherType: "pointDeduction",
+    Amount: 0,
   });
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const generateRandomVoucherID = (): string => {
+    return Math.random().toString(36).substr(2, 10).toUpperCase();
+  };
+
   const handleCreateVoucher = async () => {
     if (
-      !newVoucher.VoucherID.trim() ||
       !newVoucher.Description.trim() ||
       !newVoucher.ExpiryDate.trim() ||
-      !newVoucher.Requirement.trim() ||
-      !newVoucher.RequirementTag.trim()
+      newVoucher.Amount <= 0
     ) {
-      alert("Please fill in all required fields.");
+      alert("Please fill in all required fields and ensure Amount is greater than 0.");
       return;
     }
 
@@ -42,26 +43,23 @@ export const VoucherCreationPage = () => {
     setSuccessMessage(null);
 
     try {
-      const vouchersCollectionRef = collection(
-        db,
-        "vouchers" // Replace with the correct Firestore collection path
-      );
+      const vouchersCollectionRef = collection(db, "vouchers");
+      const randomVoucherID = generateRandomVoucherID();
 
       await addDoc(vouchersCollectionRef, {
-        VoucherID: newVoucher.VoucherID,
+        VoucherID: randomVoucherID,
         Description: newVoucher.Description,
         ExpiryDate: newVoucher.ExpiryDate,
-        Requirement: newVoucher.Requirement,
-        RequirementTag: newVoucher.RequirementTag,
+        voucherType: newVoucher.VoucherType,
+        pointsORpecent: newVoucher.Amount,
       });
 
-      setSuccessMessage("Voucher created successfully!");
+      setSuccessMessage(`Voucher created successfully! ID: ${randomVoucherID}`);
       setNewVoucher({
-        VoucherID: "",
         Description: "",
         ExpiryDate: "",
-        Requirement: "",
-        RequirementTag: "",
+        VoucherType: "pointDeduction",
+        Amount: 0,
       });
     } catch (error) {
       console.error("Error creating voucher:", error);
@@ -77,18 +75,6 @@ export const VoucherCreationPage = () => {
 
       {successMessage && <p className="success-message">{successMessage}</p>}
       {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-      <div className="form-group">
-        <label>Voucher ID:</label>
-        <input
-          type="text"
-          value={newVoucher.VoucherID}
-          onChange={(e) =>
-            setNewVoucher({ ...newVoucher, VoucherID: e.target.value })
-          }
-          placeholder="Enter a unique Voucher ID"
-        />
-      </div>
 
       <div className="form-group">
         <label>Description:</label>
@@ -113,26 +99,32 @@ export const VoucherCreationPage = () => {
       </div>
 
       <div className="form-group">
-        <label>Requirement:</label>
-        <input
-          type="text"
-          value={newVoucher.Requirement}
+        <label>Voucher Type:</label>
+        <select
+          value={newVoucher.VoucherType}
           onChange={(e) =>
-            setNewVoucher({ ...newVoucher, Requirement: e.target.value })
+            setNewVoucher({
+              ...newVoucher,
+              VoucherType: e.target.value as
+                | "pointDeduction"
+                | "percentDeduction",
+            })
           }
-          placeholder="Enter any requirements (e.g., points, milestones)"
-        />
+        >
+          <option value="Points Deduction Voucher">Points Deduction Voucher</option>
+          <option value="Percent Deduction Voucher">Percent Deduction Voucher</option>
+        </select>
       </div>
 
       <div className="form-group">
-        <label>Requirement Tag:</label>
+        <label>Amount (in points or %):</label>
         <input
-          type="text"
-          value={newVoucher.RequirementTag}
+          type="number"
+          value={newVoucher.Amount}
           onChange={(e) =>
-            setNewVoucher({ ...newVoucher, RequirementTag: e.target.value })
+            setNewVoucher({ ...newVoucher, Amount: Number(e.target.value) })
           }
-          placeholder="Enter a requirement tag (e.g., 'gold', 'silver')"
+          placeholder="Enter the amount (e.g., 5, 50)"
         />
       </div>
 

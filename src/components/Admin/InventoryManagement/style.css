@@ -200,3 +200,31 @@
     background-color: #5a6268;
   }
   
+  .inventory-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .title {
+    margin: 0; /* Ensures no unnecessary space */
+  }
+  
+  .audit-logs-button {
+    position: absolute;
+    right: 0px; /* Adjust to set the distance from the right edge */
+    padding: 8px 16px;
+    font-size: 14px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .audit-logs-button:hover {
+    background-color: #0056b3;
+  }
+  

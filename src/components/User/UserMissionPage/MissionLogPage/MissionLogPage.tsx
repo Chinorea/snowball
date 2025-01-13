@@ -11,7 +11,16 @@ interface MissionLog {
   title: string;
   details: string;
   completionDate: string;
-  pointsEarned: number;
+  expiryDate: string;
+  typeOfReward: string;
+  pointsEarned?: number | null;
+  voucherEarned?: {
+    Description: string;
+    ExpiryDate: string;
+    VoucherID: string;
+    pointsOrPercent: number;
+    voucherType: string;
+  } | null;
 }
 
 export const MissionLogsPage = () => {
@@ -49,20 +58,42 @@ export const MissionLogsPage = () => {
     <div className="mission-logs-container">
       <h1>Mission Logs</h1>
       {missionLogs.length > 0 ? (
-        <div className="mission-logs-list">
+        <ul className="mission-logs-list">
           {missionLogs.map((log) => (
-            <div key={log.id} className="mission-log-card">
+            <li key={log.id} className="mission-log-item">
               <h3>{log.title}</h3>
               <p>{log.details}</p>
               <p>
                 <strong>Completion Date:</strong> {log.completionDate}
               </p>
               <p>
-                <strong>Points Earned:</strong> {log.pointsEarned}
+                <strong>Expiry Date:</strong> {log.expiryDate}
               </p>
-            </div>
+              {log.typeOfReward === "points" ? (
+                <p>
+                  <strong>Points Earned:</strong> {log.pointsEarned || 0}
+                </p>
+              ) : (
+                log.voucherEarned && (
+                  <div className="voucher-details">
+                    <p>
+                      <strong>Voucher Description:</strong> {log.voucherEarned.Description}
+                    </p>
+                    <p>
+                      <strong>Voucher Expiry Date:</strong> {log.voucherEarned.ExpiryDate}
+                    </p>
+                    <p>
+                      <strong>Voucher Type:</strong> {log.voucherEarned.voucherType}
+                    </p>
+                    <p>
+                      <strong>Points or Percent:</strong> {log.voucherEarned.pointsOrPercent}
+                    </p>
+                  </div>
+                )
+              )}
+            </li>
           ))}
-        </div>
+        </ul>
       ) : (
         <p>No mission logs found.</p>
       )}
