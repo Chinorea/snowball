@@ -88,7 +88,7 @@
   background-color: #f1f1f1;
 }
 
-.missions-table button {
+.user-mission-button {
   padding: 5px 10px;
   font-size: 14px;
   color: #ffffff;
@@ -99,8 +99,23 @@
   transition: background-color 0.3s ease;
 }
 
-.missions-table button:hover {
+.user-mission-button:hover {
   background-color: #218838;
+}
+
+.remove-button-mission {
+  padding: 5px 10px;
+  font-size: 14px;
+  color: #ffffff;
+  background-color: #e21a1a;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.remove-button-mission:hover {
+  background-color: #800505;
 }
 
 /* Modal Overlay */

@@ -110,13 +110,12 @@ body {
 }
 
 .quantity-btn {
-  width: 30%s;
+  width: 20%;
   height: 40px;
   background-color: #e0e0e0;
   border: 1px solid #ccc;
   font-size: 16px;
   cursor: pointer;
-  justify-content: center;
 }
 
 .quantity-btn:hover {
@@ -171,7 +170,7 @@ body {
 
 /* Voucher Section Styling */
 .voucher-section {
-  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .voucher-section h5 {
@@ -243,6 +242,10 @@ body {
   background-color: #cccccc;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+h1 {
+  margin-top: 10px;
 }
 
 /* Media Query for Responsiveness */

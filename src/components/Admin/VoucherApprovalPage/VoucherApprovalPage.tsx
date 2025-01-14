@@ -212,7 +212,7 @@ export const VoucherApprovalPage = () => {
       const enrolledMissionRef = doc(db, "users", userId, "enrolledMissions", mission.id);
       await deleteDoc(enrolledMissionRef);
 
-      alert(`Mission approved and rewards granted to ${mission.username || "Unknown User"}!`);
+      // alert(`Mission approved and rewards granted to ${mission.username || "Unknown User"}!`);
       fetchUserMissions();
     } catch (err) {
       console.error("Error approving mission:", err);
@@ -254,7 +254,7 @@ export const VoucherApprovalPage = () => {
                     : mission.reward?.voucher?.Description || "N/A"}
                 </td>
                 <td>
-                  <button onClick={() => approveUserMission(mission.userId!, mission)}>
+                  <button className="user-mission-button" onClick={() => approveUserMission(mission.userId!, mission)}>
                     Approve
                   </button>
                 </td>
@@ -290,7 +290,7 @@ export const VoucherApprovalPage = () => {
                     : mission.voucher?.Description || "N/A"}
                 </td>
                 <td>
-                  <button onClick={() => handleRemoveMission(mission.id)}>Remove</button>
+                  <button className="remove-button-mission" onClick={() => handleRemoveMission(mission.id)}>Remove</button>
                 </td>
               </tr>
             ))}

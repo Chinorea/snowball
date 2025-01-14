@@ -6,85 +6,82 @@ import { db } from "@/firebase/firebaseConfig";
 import { QRCodeSVG } from "qrcode.react";
 import "./style.css";
 import { getCurrentUserEmail } from "../userInfo";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 export const VoucherCard = () => {
-  const [vouchers, setVouchers] = useState<any[]>([]); // State to store vouchers
-  const [loading, setLoading] = useState(true); // State to track loading
-  const [error, setError] = useState<string | null>(null); // State to track error
-  const [activePopup, setActivePopup] = useState<string | null>(null); // State to track active popup
-  const [showQR, setShowQR] = useState<boolean>(false); // State to track QR code visibility
+  const [vouchers, setVouchers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activePopup, setActivePopup] = useState<string | null>(null);
+  const [showQR, setShowQR] = useState<boolean>(false);
   const router = useRouter();
 
-  // Function to format expiry date
   const formatExpiryDate = (expiryDate: any) => {
     if (expiryDate && expiryDate.toDate) {
-      return expiryDate.toDate().toLocaleDateString(); // Format the Firebase timestamp to a readable date
+      return expiryDate.toDate().toLocaleDateString();
     }
     return expiryDate;
   };
 
-  // Fetch vouchers from Firestore
   const fetchVouchers = async () => {
     try {
       const currentUserEmail = getCurrentUserEmail();
-      // Reference to the user's document and Vouchers subcollection
-      if(currentUserEmail == null){
+      if (currentUserEmail == null) {
         router.push("");
       }
-      console.log(currentUserEmail);
-      const userDocRef = doc(db, "users", currentUserEmail); //TODO: bring actual Email
+      const userDocRef = doc(db, "users", currentUserEmail);
       const vouchersCollectionRef = collection(userDocRef, "Vouchers");
-
-      // Fetch all documents in the Vouchers subcollection
       const vouchersSnapshot = await getDocs(vouchersCollectionRef);
       const fetchedVouchers = vouchersSnapshot.docs.map((doc) => {
         const data = doc.data();
         return {
-          id: doc.id, // Firestore document ID
-          VoucherID: data.VoucherID || "No ID", // Extract VoucherID
-          Description: data.Description || "No description", // Extract Description
-          ExpiryDate: formatExpiryDate(data.ExpiryDate) || "No expiry date", // Format and Extract ExpiryDate
+          id: doc.id,
+          VoucherID: data.VoucherID || "No ID",
+          Description: data.Description || "No description",
+          ExpiryDate: formatExpiryDate(data.ExpiryDate) || "No expiry date",
         };
       });
 
-      setVouchers(fetchedVouchers); // Store vouchers in state
+      setVouchers(fetchedVouchers);
     } catch (error) {
       console.error("Error fetching vouchers:", error);
       setError("There was an error fetching the vouchers. Please try again later.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
-  // Toggle popup for a specific voucher
   const togglePopup = (voucherId: string) => {
-    setShowQR(false); // Reset QR code visibility
-    setActivePopup(activePopup === voucherId ? null : voucherId); // Toggle popup visibility
+    setShowQR(false);
+    setActivePopup(activePopup === voucherId ? null : voucherId);
   };
 
   const confirmVoucher = () => {
-    setShowQR(true); // Show QR code when confirmed
+    setShowQR(true);
   };
 
   useEffect(() => {
     fetchVouchers();
-  }, []); // Run once on component mount
+  }, []);
 
-  // If loading, show a loading spinner or message
   if (loading) {
     return <div>Loading vouchers...</div>;
   }
 
-  // If error occurred, show an error message
   if (error) {
     return <div>{error}</div>;
   }
 
-  // Render voucher cards
   return (
     <div>
-      <h1></h1>
+      <div className="header">
+        <button
+          className="navigate-logs-button"
+          onClick={() => router.push("/Voucher/Voucherlogs")}
+        >
+          View Used Vouchers
+        </button>
+      </div>
       <div className="voucher-container">
         {vouchers.length > 0 ? (
           vouchers.map((voucher) => (
@@ -94,13 +91,9 @@ export const VoucherCard = () => {
                 <p>Description: {voucher.Description}</p>
                 <p>Expiry Date: {voucher.ExpiryDate}</p>
               </div>
-
-              {/* Blue button inside each card */}
               <button className="popup-button" onClick={() => togglePopup(voucher.id)}>
                 Show Details
               </button>
-
-              {/* Popup Screen for specific voucher */}
               {activePopup === voucher.id && (
                 <div className="popup-overlay">
                   <div className="popup-content">
@@ -124,11 +117,10 @@ export const VoucherCard = () => {
                     ) : (
                       <>
                         <h2>Voucher QR Code</h2>
-                        {/* Display QR Code containing VoucherID */}
                         <div className="qr-code-container">
-                            <QRCodeSVG value={voucher.VoucherID} size={200} />
-                            <p>Scan this QR code to use the voucher.</p>
-                            <button onClick={() => togglePopup(voucher.id)}>Close</button>
+                          <QRCodeSVG value={voucher.VoucherID} size={200} />
+                          <p>Scan this QR code to use the voucher.</p>
+                          <button onClick={() => togglePopup(voucher.id)}>Close</button>
                         </div>
                       </>
                     )}
