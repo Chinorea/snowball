@@ -13,7 +13,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {/* The `children` will be dynamically rendered */}
         <div>{children}</div>
       </body>
     </html>
