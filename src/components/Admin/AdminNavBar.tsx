@@ -8,7 +8,7 @@ export const AdminNavbar = () => {
     const navigation = [
         { label: "User Management", href: "/Dashboard" },
         { label: "Voucher Approval", href: "/VoucherApproval" },
-        { label: "Inventory", href: "/Inventory" },
+        { label: "Inventory", href: "/InventoryTab" },
         { label: "Product Request", href: "/ProductReq" },
         { label: "Pre-ordered Request", href: "/PreorderReq" },
         { label: "Voucher Creation", href: "/Voucher/CreateVoucher" },
