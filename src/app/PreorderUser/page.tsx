@@ -1,13 +1,15 @@
+import React, { Suspense } from "react";
 import { Container } from "@/components/Container";
 import { UserNavbar } from "@/components/User/UserNavBar";
-
 import { PreorderPage } from "@/components/User/PreorderPage/PreorderPage";
 
-export default function product() {
+export default function Preorder() {
   return (
     <Container>
-        <UserNavbar /> 
+      <UserNavbar />
+      <Suspense fallback={<div>Loading...</div>}>
         <PreorderPage />
+      </Suspense>
     </Container>
   );
 }

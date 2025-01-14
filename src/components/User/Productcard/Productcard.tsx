@@ -128,11 +128,7 @@ export const ProductCardPage = () => {
       alert("Failed to add product to cart. Please try again.");
     }
   };
-
-  const handlePreOrder = (product: Product) => {
-    router.push("/Preorder");
-  };
-
+  
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -195,11 +191,11 @@ export const ProductCardPage = () => {
                   className="preorder-button"
                   onClick={() =>
                     router.push(
-                      `/Preorder?productName=${product.name}&pointsRequired=${product.pointsRequired}`
+                      `/PreorderUser?productName=${encodeURIComponent(product.name)}&pointsRequired=${product.pointsRequired}`
                     )
                   }
                 >
-                  Pre-order
+                  Preorder
                 </button>
               )}
             </div>

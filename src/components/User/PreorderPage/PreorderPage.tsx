@@ -39,16 +39,18 @@ export const PreorderPage = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const productName = searchParams.get("productName");
-    const pointsPerUnit = Number(searchParams.get("pointsRequired"));
-
-    if (productName && pointsPerUnit) {
-      setProductDetails({
-        productName,
-        pointsPerUnit,
-        totalPoints: pointsPerUnit,
-        quantity: 1,
-      });
+      if (searchParams != null ) {
+        const productName = searchParams.get("productName");
+        const pointsPerUnit = Number(searchParams.get("pointsRequired"));
+    
+        if (productName && pointsPerUnit) {
+          setProductDetails({
+            productName,
+            pointsPerUnit,
+            totalPoints: pointsPerUnit,
+            quantity: 1,
+          });
+      }
     }
 
     fetchPreorders();
@@ -192,7 +194,7 @@ export const PreorderPage = () => {
             <strong>Points Per Unit:</strong> {productDetails.pointsPerUnit}
           </p>
         </div>
-        <div >
+        <div className="quantity-input">
           <input
             type="number"
             placeholder="Quantity"
@@ -235,7 +237,7 @@ export const PreorderPage = () => {
                   <td>{preorder.productName}</td>
                   <td>{preorder.quantity}</td>
                   <td>{preorder.totalPoints}</td>
-                  <td>{preorder.status}</td> {/* Display the status */}
+                  <td>{preorder.status}</td> 
                 </tr>
               ))}
             </tbody>
