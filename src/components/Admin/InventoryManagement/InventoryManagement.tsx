@@ -216,7 +216,7 @@ export const InventoryManagement = () => {
                     onClick={() => setEditProduct(product)}
                     className="edit-button"
                   >
-                    Edit
+                    Edit 
                   </button>
                   <button
                     onClick={() => handleDeleteProduct(product.id)}
