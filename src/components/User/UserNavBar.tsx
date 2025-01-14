@@ -2,105 +2,33 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Disclosure } from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 import { clearCurrentUserEmail, setIsUser } from "./userInfo";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { collection, getDocs, doc, getDoc, deleteDoc } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
+import { Fragment, useState } from "react";
 import { getCurrentUserEmail } from "./userInfo";
+import "./style.css";
 
 export const UserNavbar = () => {
   const router = useRouter();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  // const [showNotifications, setShowNotifications] = useState(false);
-  // const [notifications, setNotifications] = useState<number>(0);
-
   const navigation = [
     { label: "Product", href: "/Product" },
     { label: "Voucher", href: "/Voucher" },
     { label: "Request Product", href: "/ReqProductUser" },
     { label: "Mission", href: "/Mission" },
-    { label: "Auction House", href: "/AuctionHouse" }
+    { label: "Auction House", href: "/AuctionHouse" },
   ];
 
   const currentUserEmail = getCurrentUserEmail();
 
-  // Fetch preorders and stock to check notifications
-  // const fetchNotifications = async () => {
-  //   if (!currentUserEmail) return;
-  
-  //   try {
-  //     // Fetch preorders for the current user
-  //     const preorderCollectionRef = collection(
-  //       db,
-  //       "users",
-  //       currentUserEmail,
-  //       "Preorders"
-  //     );
-  //     const preorderSnapshot = await getDocs(preorderCollectionRef);
-  
-  //     // Fetch all products
-  //     const productCollectionRef = collection(db, "Products");
-  //     const productSnapshot = await getDocs(productCollectionRef);
-  
-  //     // Map stock data
-  //     const productStock = productSnapshot.docs.reduce((map, doc) => {
-  //       const data = doc.data();
-  //       map[doc.id] = data.Stock;
-  //       return map;
-  //     }, {} as Record<string, number>);
-  
-  //     let count = 0; // Notification count
-  //     const fulfilledPreorders: string[] = []; // Track fulfilled preorders
-  
-  //     preorderSnapshot.forEach((doc) => {
-  //       const preorder = doc.data();
-  //       const productId = preorder.productId; // Ensure preorders have productId
-  //       const preorderQuantity = preorder.quantity || 0;
-  
-  //       const stockAvailable = productStock[productId] || 0;
-  
-  //       if (stockAvailable >= preorderQuantity) {
-  //         count++;
-  //         fulfilledPreorders.push(doc.id); // Track fulfilled preorder IDs
-  //       }
-  //     });
-  
-  //     // Update notifications count
-  //     setNotifications(count);
-  
-  //     // Remove fulfilled preorders from Firestore
-  //     for (const preorderId of fulfilledPreorders) {
-  //       const preorderDocRef = doc(
-  //         db,
-  //         "users",
-  //         currentUserEmail,
-  //         "Preorders",
-  //         preorderId
-  //       );
-  //       await deleteDoc(preorderDocRef);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching notifications:", error);
-  //   }
-  // };
-  
-  
-
-  // useEffect(() => {
-  //   fetchNotifications();
-  // }, []);
-
-  const handleConfirmLogout = () => {
-    // Handle logout logic here
+  const handleLogout = () => {
     clearCurrentUserEmail();
     setIsUser();
     window.location.href = "/";
   };
 
   return (
-    <div className="w-full ">
+    <div className="w-full">
       <nav
         className="container relative flex items-center justify-between mx-auto lg:flex-row lg:justify-between xl:px-1 rounded-lg shadow-lg"
         style={{ padding: "8px 16px", height: "150px" }}
@@ -134,36 +62,6 @@ export const UserNavbar = () => {
 
         {/* Right-Aligned Buttons */}
         <div className="flex items-center gap-4">
-          {/* Notification Button */}
-          {/* <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative flex items-center justify-center w-12 h-12 text-white bg-blue-600 rounded-full hover:bg-blue-700"
-            >
-              🔔
-              {notifications > 0 && (
-                <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
-                  {notifications}
-                </span>
-              )}
-            </button>
-
-            {showNotifications && (
-              <div className="absolute right-0 z-50 w-64 p-4 mt-2 bg-white border rounded shadow-lg">
-                {notifications > 0 ? (
-                  <p className="text-sm text-gray-700">
-                    {notifications} preorders can be fulfilled. Check inventory!
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-700">
-                    No new notifications.
-                  </p>
-                )}
-                
-              </div>
-            )}
-          </div> */}
-
           {/* Cart Button */}
           <Link
             href="/Cart"
@@ -172,42 +70,57 @@ export const UserNavbar = () => {
             Cart
           </Link>
 
-          {/* Log Out Button */}
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center justify-center h-12"
-            style={{ marginTop: "20px" }}
-          >
-            Log Out
-          </button>
+          {/* User Bubble */}
+          <Menu as="div" className="relative">
+            <Menu.Button className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full hover:bg-gray-300">
+              <Image
+                src="/img/user-avatar.png"
+                alt="User Avatar"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+            </Menu.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute right-0 z-10 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg focus:outline-none">
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href="/Settings"
+                    className={`${
+                      active ? "bg-gray-100" : ""
+                    } block px-4 py-2 text-sm text-gray-700 focus:outline-none`}
+                  >
+                    Settings
+                  </Link>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    onClick={handleLogout}
+                    href="/"
+                    className={`${
+                      active ? "bg-gray-100" : ""
+                    } block w-full text-left px-4 py-2 text-sm text-gray-700 focus:outline-none`}
+                  >
+                    Log Out
+                  </Link>
+                )}
+              </Menu.Item>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
       </nav>
-
-      {/* Logout Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="w-full max-w-md p-6 bg-white rounded-md shadow-lg">
-            <h2 className="text-lg font-bold text-gray-800">Confirm Logout</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Are you sure you want to log out?
-            </p>
-            <div className="flex items-center justify-end mt-4 space-x-3">
-              <button
-                onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-              >
-                Log Out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

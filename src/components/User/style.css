@@ -1,0 +1,4 @@
+/* Reset focus outline */
+.block:focus {
+    outline: none !important;
+  }
