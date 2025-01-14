@@ -12,6 +12,7 @@ export const AdminNavbar = () => {
         { label: "Product Request", href: "/ProductReq" },
         { label: "Pre-ordered Request", href: "/PreorderReq" },
         { label: "Voucher Creation", href: "/Voucher/CreateVoucher" },
+        { label: "Auction Manager", href:"/AuctionManager"},
       ];
 
   return (

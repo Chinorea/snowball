@@ -79,9 +79,11 @@ export const TransactionHistoryPage = () => {
 
   return (
     <div className="transaction-history-container">
-      <h1></h1>
+      <div className="header-container">
+      <h1>Transaction History</h1>
       <div className="go-back-container">
         <button className="go-back-button" onClick={() => router.push("/Product")}>Go Back</button>
+      </div>
       </div>
   
       {transactions.length > 0 ? (

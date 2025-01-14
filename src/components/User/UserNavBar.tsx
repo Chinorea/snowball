@@ -21,6 +21,7 @@ export const UserNavbar = () => {
     { label: "Voucher", href: "/Voucher" },
     { label: "Request Product", href: "/ReqProductUser" },
     { label: "Mission", href: "/Mission" },
+    { label: "Auction House", href: "/AuctionHouse" }
   ];
 
   const currentUserEmail = getCurrentUserEmail();

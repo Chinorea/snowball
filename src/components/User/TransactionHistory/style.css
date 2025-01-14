@@ -257,3 +257,20 @@ tr:nth-child(odd) {
   cursor: pointer;
   margin-left: 20px;
 }
+
+/* Align "Go Back" button and title */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.transaction-history-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

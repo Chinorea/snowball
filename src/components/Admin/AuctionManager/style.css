@@ -1,0 +1,205 @@
+/* General Container Styling */
+.auction-house-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Header Section */
+.header-with-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-with-button h1 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.header-with-button button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.header-with-button button:hover {
+  background-color: #0056b3;
+}
+
+/* Active and Completed Auctions Sections */
+.active-auctions-section,
+.completed-auctions-section {
+  margin-top: 30px;
+}
+
+.active-auctions-section h2,
+.completed-auctions-section h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 15px;
+}
+
+/* Table Styling */
+.missions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.missions-table th,
+.missions-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.missions-table th {
+  background-color: #f4f4f4;
+  color: #333333;
+  font-weight: bold;
+}
+
+.missions-table td {
+  color: #555555;
+}
+
+.missions-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.missions-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Bid Button Styling */
+.bid-button {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: white;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.bid-button:hover {
+  background-color: #218838;
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1001;
+}
+
+.modal-content h2 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.modal-content label {
+  font-size: 14px;
+  color: #555555;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.modal-content button {
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-content button:first-child {
+  background-color: #007bff;
+  color: white;
+}
+
+.modal-content button:first-child:hover {
+  background-color: #0056b3;
+}
+
+.modal-content button:last-child {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal-content button:last-child:hover {
+  background-color: #d32f2f;
+}
+
+/* Loading and Error States */
+.loading {
+  font-size: 16px;
+  color: #555555;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.error {
+  font-size: 16px;
+  color: #f44336;
+  text-align: center;
+  margin-top: 20px;
+}
