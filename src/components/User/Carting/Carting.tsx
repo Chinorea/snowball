@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import {
   collection,
-  getDocs,
   doc,
+  getDocs,
   getDoc,
   writeBatch,
   setDoc,
-  updateDoc,
   deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
@@ -19,12 +19,12 @@ import { getCurrentUserEmail } from "../userInfo";
 
 export const Carting = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
-  const [selectedVoucher, setSelectedVoucher] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
-
+  const [selectedVoucher, setSelectedVoucher] = useState<any | null>(null);
   const [startingPoints, setStartingPoints] = useState<number>(0);
-  const [calculatedRemainingPoints, setCalculatedRemainingPoints] =
-    useState<number | null>(null);
+  const [calculatedRemainingPoints, setCalculatedRemainingPoints] = useState<number | null>(null);
+  const [subtotal, setSubtotal] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
 
   const router = useRouter();
   const CurrentUserEmail = getCurrentUserEmail();
@@ -52,7 +52,7 @@ export const Carting = () => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         setStartingPoints(parseInt(userData.points));
-        calculateRemainingPoints(parseInt(userData.points), items);
+        calculateSubtotalAndRemainingPoints(parseInt(userData.points), items);
       }
     } catch (error) {
       console.error("Error fetching cart items or user points:", error);
@@ -63,12 +63,34 @@ export const Carting = () => {
     fetchCartItemsAndPoints();
   }, []);
 
-  const calculateRemainingPoints = (userPoints: number, items: any[]) => {
+  useEffect(() => {
+    calculateSubtotalAndRemainingPoints(startingPoints, cartItems);
+  }, [selectedVoucher, cartItems]);
+
+  const calculateSubtotalAndRemainingPoints = (
+    userPoints: number,
+    items: any[]
+  ) => {
     const totalPointsRequired = items.reduce(
       (total, item) => total + item.pointsRequired * item.quantity,
       0
     );
-    setCalculatedRemainingPoints(userPoints - totalPointsRequired);
+
+    let discountValue = 0;
+    if (selectedVoucher) {
+      if (selectedVoucher.voucherType === "pointDeduction") {
+        discountValue = selectedVoucher.PointORpercent;
+      } else if (selectedVoucher.voucherType === "percentDeduction") {
+        discountValue =
+          (totalPointsRequired * selectedVoucher.PointORpercent) / 100;
+      }
+    }
+
+    setSubtotal(totalPointsRequired);
+    setDiscount(discountValue);
+    const total = totalPointsRequired - discountValue >= 0 ? totalPointsRequired - discountValue : 0;
+    setTotal(total);
+    setCalculatedRemainingPoints(userPoints - total);
   };
 
   const handleQuantityChange = async (id: string, newQuantity: number) => {
@@ -78,8 +100,7 @@ export const Carting = () => {
       );
 
       setCartItems(updatedItems);
-
-      calculateRemainingPoints(startingPoints, updatedItems);
+      calculateSubtotalAndRemainingPoints(startingPoints, updatedItems);
 
       const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartDocRef = doc(userDocRef, "CartList", id);
@@ -94,8 +115,7 @@ export const Carting = () => {
       const updatedItems = cartItems.filter((item) => item.id !== id);
 
       setCartItems(updatedItems);
-
-      calculateRemainingPoints(startingPoints, updatedItems);
+      calculateSubtotalAndRemainingPoints(startingPoints, updatedItems);
 
       const userDocRef = doc(db, "users", CurrentUserEmail);
       const cartDocRef = doc(userDocRef, "CartList", id);
@@ -115,10 +135,14 @@ export const Carting = () => {
         alert("User not found.");
         return;
       }
+
       const userData = userDoc.data();
       let userPoints = parseInt(userData.points);
 
-      let totalPointsSpent = 0;
+      if (userPoints < total) {
+        alert("Not enough points for this transaction.");
+        return;
+      }
 
       for (const item of cartItems) {
         const productRef = doc(db, "Products", item.id);
@@ -127,9 +151,6 @@ export const Carting = () => {
         if (productDoc.exists()) {
           const productData = productDoc.data();
           if (productData.Stock >= item.quantity) {
-            const pointsSpentOnItem = item.pointsRequired * item.quantity;
-            totalPointsSpent += pointsSpentOnItem;
-
             batch.update(productRef, {
               Stock: productData.Stock - item.quantity,
             });
@@ -138,14 +159,10 @@ export const Carting = () => {
             await setDoc(doc(transactionRef), {
               productId: item.id,
               productName: item.name,
-              pointsSpent: pointsSpentOnItem.toString(),
+              pointsSpent: item.pointsRequired * item.quantity,
               timestamp: new Date().toISOString(),
-              paymentMethod,
-              voucher: selectedVoucher,
+              voucherUsed: selectedVoucher ? selectedVoucher.VoucherID : null,
             });
-
-            const cartDocRef = doc(userDocRef, "CartList", item.id);
-            batch.delete(cartDocRef);
           } else {
             alert(`Not enough stock for ${item.name}`);
             return;
@@ -153,12 +170,22 @@ export const Carting = () => {
         }
       }
 
-      if (userPoints < totalPointsSpent) {
-        alert("Not enough points for this transaction.");
-        return;
+      if (selectedVoucher) {
+        const usedVoucherRef = collection(userDocRef, "usedVouchers");
+        const voucherDocRef = doc(userDocRef, "Vouchers", selectedVoucher.id);
+
+        await setDoc(doc(usedVoucherRef), selectedVoucher);
+        await deleteDoc(voucherDocRef);
       }
 
-      userPoints -= totalPointsSpent;
+      // Remove all items in the cart
+      const cartCollectionRef = collection(userDocRef, "CartList");
+      const cartSnapshot = await getDocs(cartCollectionRef);
+      cartSnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      userPoints -= total;
       batch.update(userDocRef, { points: userPoints.toString() });
 
       await batch.commit();
@@ -197,43 +224,28 @@ export const Carting = () => {
                 <button
                   className="quantity-btn"
                   onClick={() =>
-                    handleQuantityChange(
-                      item.id,
-                      Math.max(1, item.quantity - 1)
-                    )
+                    handleQuantityChange(item.id, Math.max(1, item.quantity - 1))
                   }
                   disabled={item.quantity <= 1}
                 >
                   -
                 </button>
-                <input
-                  type="number"
-                  value={item.quantity}
-                  min="1"
-                  max={item.stock}
-                  onChange={(e) =>
-                    handleQuantityChange(item.id, parseInt(e.target.value))
-                  }
-                  className="quantity-input"
-                />
+                <input type="text" value={item.quantity} className="quantity-input" readOnly />
                 <button
                   className="quantity-btn"
                   onClick={() =>
-                    handleQuantityChange(
-                      item.id,
-                      Math.min(item.stock, item.quantity + 1)
-                    )
+                    handleQuantityChange(item.id, Math.min(item.stock, item.quantity + 1))
                   }
                   disabled={item.quantity >= item.stock}
                 >
                   +
                 </button>
                 <button
-                className="remove-item-btn"
-                onClick={() => handleRemoveItem(item.id)}
-              >
-                ×
-              </button>
+                  className="remove-item-btn"
+                  onClick={() => handleRemoveItem(item.id)}
+                >
+                  ×
+                </button>
               </div>
             </div>
           </div>
@@ -243,17 +255,21 @@ export const Carting = () => {
         <h5>Select Voucher</h5>
         <VoucherList setSelectedVoucher={setSelectedVoucher} />
       </div>
-      <p>
-        Remaining Points (Before Transaction):{" "}
-        {calculatedRemainingPoints !== null
-          ? calculatedRemainingPoints
-          : "Calculating..."}
-      </p>
+      <div className="summary-section">
+        <p>Subtotal: {subtotal} Points</p>
+        <p>Discount: -{discount} Points</p>
+        <p>Total Cost: {total} Points</p>
+        <h1></h1>
+        <p>
+          Remaining Points (After Discount):{" "}
+          {calculatedRemainingPoints !== null
+            ? calculatedRemainingPoints
+            : "Calculating..."}
+        </p>
+      </div>
       <div className="checkout-btn-container">
         <button
-          className={`checkout-btn ${
-            cartItems.length === 0 ? "disabled-btn" : ""
-          }`}
+          className={`checkout-btn ${cartItems.length === 0 ? "disabled-btn" : ""}`}
           onClick={handleCheckout}
           disabled={cartItems.length === 0}
         >
