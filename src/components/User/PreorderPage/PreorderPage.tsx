@@ -47,8 +47,8 @@ export const PreorderPage = () => {
           setProductDetails({
             productName,
             pointsPerUnit,
-            totalPoints: pointsPerUnit,
-            quantity: 1,
+            totalPoints: 0,
+            quantity: 0,
           });
       }
     }
@@ -90,12 +90,12 @@ export const PreorderPage = () => {
 
     try {
       const userDocRef = doc(db, "users", currentUserEmail);
-      const userDoc = await getDoc(userDocRef);
+      const userDoc = await getDoc(userDocRef); 
 
       if (userDoc.exists()) {
         const points = userDoc.data().points || 0;
         setUserPoints(points);
-        setRemainingPoints(points); // Initially set remaining points to current points
+        setRemainingPoints(points-productDetails.totalPoints); // Initially set remaining points to current points
       }
     } catch (err) {
       console.error("Error fetching user points:", err);
@@ -152,7 +152,7 @@ export const PreorderPage = () => {
   };
 
   const handleQuantityChange = (quantity: number) => {
-    if (quantity < 1) return;
+    if (quantity < 0) return;
     const totalPoints = quantity * productDetails.pointsPerUnit;
     setProductDetails((prev) => ({
       ...prev,
@@ -194,14 +194,14 @@ export const PreorderPage = () => {
             <strong>Points Per Unit:</strong> {productDetails.pointsPerUnit}
           </p>
         </div>
-        <div className="quantity-input">
+        <div >
           <input
             type="number"
             placeholder="Quantity"
             value={productDetails.quantity}
             onChange={(e) => handleQuantityChange(Number(e.target.value))}
             className="input-field"
-            min="1"
+            min="0"
           />
         </div>
         <div className="points-summary">
