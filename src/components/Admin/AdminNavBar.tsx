@@ -16,9 +16,9 @@ export const AdminNavbar = () => {
       dropdown: [
         { label: "Mission Tracking", href: "/VoucherApproval" },
         { label: "Voucher Creation", href: "/Voucher/CreateVoucher" },
-        { label: "Auction Manager", href:"/AuctionManager"},
       ],
     },
+    { label: "Auction Manager", href:"/AuctionManager"},
     { label: "Inventory", href: "/InventoryTab" },
   ];
 
