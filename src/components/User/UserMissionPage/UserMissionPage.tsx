@@ -141,17 +141,17 @@ export const UserMissionPage = () => {
               <div key={index} className="mission-card enrolled">
                 <h3>{mission.title}</h3>
                 <p>{mission.details}</p>
-                <p>
-                  <strong>Completion Date:</strong> {mission.completionDate}
-                </p>
-                {mission.reward?.type === "points" ? (
                   <p>
-                    <strong>Points Worth:</strong> {mission.reward.amount}
+                    <strong>Completion Date:</strong> {mission.completionDate}
                   </p>
-                ) : (
-                  <p>
-                    <strong>Voucher:</strong> {mission.reward?.voucher?.Description}
-                  </p>
+                  {mission.reward?.type === "points" ? (
+                    <p>
+                      <strong>Points Worth:</strong> {mission.reward.amount}
+                    </p>
+                  ) : (
+                    <p>
+                      <strong>Voucher:</strong> {mission.reward?.voucher?.Description}
+                    </p>
                 )}
                 <p>
                   <strong>Status:</strong> {mission.status || "N/A"}

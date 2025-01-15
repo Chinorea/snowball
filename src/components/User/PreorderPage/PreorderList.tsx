@@ -80,7 +80,7 @@ export const PreorderList = () => {
                 <th>Product Name</th>
                 <th>Quantity</th>
                 <th>Total Points</th>
-                <th>Status</th> {/* Add status column */}
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -89,7 +89,7 @@ export const PreorderList = () => {
                   <td>{preorder.productName}</td>
                   <td>{preorder.quantity}</td>
                   <td>{preorder.totalPoints}</td>
-                  <td>{preorder.status}</td> {/* Display status */}
+                  <td>{preorder.status}</td> 
                 </tr>
               ))}
             </tbody>

@@ -39,16 +39,18 @@ export const PreorderPage = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const productName = searchParams.get("productName");
-    const pointsPerUnit = Number(searchParams.get("pointsRequired"));
-
-    if (productName && pointsPerUnit) {
-      setProductDetails({
-        productName,
-        pointsPerUnit,
-        totalPoints: pointsPerUnit,
-        quantity: 1,
-      });
+      if (searchParams != null ) {
+        const productName = searchParams.get("productName");
+        const pointsPerUnit = Number(searchParams.get("pointsRequired"));
+    
+        if (productName && pointsPerUnit) {
+          setProductDetails({
+            productName,
+            pointsPerUnit,
+            totalPoints: 0,
+            quantity: 0,
+          });
+      }
     }
 
     fetchPreorders();
@@ -88,12 +90,12 @@ export const PreorderPage = () => {
 
     try {
       const userDocRef = doc(db, "users", currentUserEmail);
-      const userDoc = await getDoc(userDocRef);
+      const userDoc = await getDoc(userDocRef); 
 
       if (userDoc.exists()) {
         const points = userDoc.data().points || 0;
         setUserPoints(points);
-        setRemainingPoints(points); // Initially set remaining points to current points
+        setRemainingPoints(points-productDetails.totalPoints); // Initially set remaining points to current points
       }
     } catch (err) {
       console.error("Error fetching user points:", err);
@@ -150,7 +152,7 @@ export const PreorderPage = () => {
   };
 
   const handleQuantityChange = (quantity: number) => {
-    if (quantity < 1) return;
+    if (quantity < 0) return;
     const totalPoints = quantity * productDetails.pointsPerUnit;
     setProductDetails((prev) => ({
       ...prev,
@@ -199,7 +201,7 @@ export const PreorderPage = () => {
             value={productDetails.quantity}
             onChange={(e) => handleQuantityChange(Number(e.target.value))}
             className="input-field"
-            min="1"
+            min="0"
           />
         </div>
         <div className="points-summary">
@@ -235,7 +237,7 @@ export const PreorderPage = () => {
                   <td>{preorder.productName}</td>
                   <td>{preorder.quantity}</td>
                   <td>{preorder.totalPoints}</td>
-                  <td>{preorder.status}</td> {/* Display the status */}
+                  <td>{preorder.status}</td> 
                 </tr>
               ))}
             </tbody>
