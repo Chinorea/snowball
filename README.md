@@ -17,6 +17,10 @@ This project leverages the following technologies:
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
+- [Navigation Guide](#navigation-guide)
+    - [For Residents](#for-residents)
+    - [For Admins](#for-admins)
+- [Tips for Efficient Use](#tips-for-efficient-use)
 - [Features](#features)
 - [License](#license)
 
@@ -36,35 +40,63 @@ This project leverages the following technologies:
    ```
 ## Usage
 
-To start the application:
+### Getting Started
+To start the application locally:
 ```bash
 npm start
 ```
-### As a Resident:
-1. **Sign-Up**:  
-   Register either your credential or Sign up using your google account to access application as a User.
 
-2. **Dashboard Features**:  
-   - View account balance, transaction history, and pre-orders.  
-   - Add items to your shopping cart.  
-   - Search 
+### Accessing the Application
 
-3. **Auction House**:  
-   - Place bids on exclusive or special items.  
-   - Enhance engagement and foster community participation.
+### Residents:
+- **Sign-Up**:  
+  - Register using your credentials or a Google account.  
+  - Log in to access features like shopping, vouchers, missions, and auctions.
 
----
-
-### As an Admin:
-- **Login Credentials**:  
+### Admins:
+- **Default Admin Credentials**:  
   - **User**: `admin@gmail.com`  
-  - **Password**: `123123`  
+  - **Password**: `12341234`  
+- Access admin tools for managing users, inventory, and reports.
 
-- **Admin Features**:  
-  - Configure user permissions and product pricing.  
-  - Upload and manage auction items.  
-  - Maintain platform data using streamlined tools.
+## Navigation Guide
 
+### For Residents:
+- **Dashboard**:  
+   - View your points balance, transaction history, and pre-orders.
+   - Search, browse, and add items to your cart or pre-order unavailable products.
+- **Vouchers**:  
+  - View voucher balance and voucher details.
+  - View QR code of each voucher.
+  - View redeemed voucher history.
+- **Missions**:  
+  - Enroll in missions to earn points or voucher.
+  - Track completion statuses.
+- **Auction House**:  
+  - Place bids on exclusive items and track your auction history.
+
+### For Admins:
+- **User Management**:  
+  - Add, edit, suspend users, and manage user roles or points.
+- **Requests**:  
+  - Approve or reject product and pre-order requests.
+- **Missions**:  
+  - Create and manage user missions and track progress.
+  - Approve user mission completion.
+  - Generate custom vouchers with specific rewards and expiration dates.
+- **Reports**:  
+  - Generate summaries of weekly requests and inventory levels.
+- **Inventory**:  
+  - Add, edit, and manage stock or product details.
+  - View movement of Inventory log
+- **Auctions**:  
+  - Create, manage, and close auctions for exclusive items.
+
+## Tips for Efficient Use
+- **Residents**:  
+  Check the **Missions** tab regularly for opportunities to earn rewards and points.
+- **Admins**:  
+  Leverage the **Reports** feature for data-driven insights into user activity and inventory trends.
 
 ## Features
 
@@ -93,9 +125,6 @@ npm start
 6. **Auction House**:
    - Participate in auctions by placing bids on exclusive items.
    - View completed auction history and details of your bids.
-
-7. **Navigation Bar**:
-   - Seamlessly switch between sections like **Product**, **Voucher**, **Request Product**, **Mission**, and **Auction House** for an intuitive user experience.
 
 ---
 
@@ -128,15 +157,6 @@ npm start
    - Generate comprehensive reports, including:
      - Weekly requests summaries to track demand trends.
      - Inventory summaries to monitor stock levels and product movement.
-
-7. **Dropdown Menu Navigation**:
-   - Seamlessly navigate between sections such as:
-     - **Pre-ordered Requests**
-     - **Product Requests**
-     - **Mission Tracking**
-     - **Voucher Creation**
-     - **Inventory Management**
-
 
 ## License
 
