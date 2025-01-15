@@ -12,7 +12,7 @@ import {
 import { db } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
 import { useRouter } from "next/navigation"; 
 import "./style.css"; // Include the CSS file
-import { getCurrentUserEmail, getIsAdmin } from "../userInfo";
+import { getCurrentUserEmail, getIsAdmin, setCurrentProfileImage } from "../userInfo";
 
 interface Product {
   id: string;
@@ -75,6 +75,9 @@ export const ProductCardPage = () => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         setUser({ id: userDoc.id, points: userData.points || 0 });
+        if (userData.profilePicture) {
+          setCurrentProfileImage(userData.profilePicture);
+        } 
       } else {
         console.error("User document does not exist");
         setError("User data not found.");

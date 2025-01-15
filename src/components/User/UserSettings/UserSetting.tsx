@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { get } from "http";
-import { getCurrentUserEmail } from "../userInfo";
+import { getCurrentUserEmail, getCurrentProfileImage,setCurrentProfileImage } from "../userInfo";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { updatePassword, updateEmail } from "firebase/auth";
+
 
 export const SettingsPage = () => {
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
@@ -20,7 +21,6 @@ export const SettingsPage = () => {
   const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      //setProfilePicture(URL.createObjectURL(file));
       const reader = new FileReader();
 
       reader.onload = async () => {
@@ -30,7 +30,8 @@ export const SettingsPage = () => {
         const userRef = doc(db, "users", email);
         await updateDoc(userRef, { profilePicture: base64String });
   
-        setProfilePicture(base64String); // Update state to reflect the uploaded image
+        setProfilePicture(base64String);
+        setCurrentProfileImage(base64String); // Update state to reflect the uploaded image
         console.log("Profile picture uploaded successfully.");
       };
   
@@ -40,6 +41,7 @@ export const SettingsPage = () => {
 
   const handleRemoveProfilePicture = async () => {
     setProfilePicture("/img/default_profile_image.png");
+    setCurrentProfileImage("/img/default_profile_image.png");
     const userRef = doc(db, "users", email);
     await updateDoc(userRef, { profilePicture: null });
     console.log("Profile picture removed successfully.");
@@ -85,13 +87,13 @@ export const SettingsPage = () => {
         setLastName(userData.lastName);      
         if (userData.profilePicture) {
           setProfilePicture(userData.profilePicture);
-        } else {
-          // Set default profile image if no profile picture exists
-          setProfilePicture("/img/default_profile_image.png");
+          setCurrentProfileImage(userData.profilePicture);
         }
+        else{
+          setProfilePicture(getCurrentProfileImage());
+        } 
       } else {
         console.error("No such document!");
-        setProfilePicture("/img/default_profile_image.png"); // Default profile image for new users
       }
     });
   };
