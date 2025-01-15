@@ -53,10 +53,17 @@ export const SettingsPage = () => {
       console.error("No user is currently signed in.");
       return;
     }
-    if(confirmPassword == newPassword && newPassword.length >= 6 ){
+
+    if (confirmPassword != newPassword){
+        alert("Passwords do not match.");
+        return;
+    } else if (newPassword.length < 6 && newPassword.length >= 1){
+        alert("Password must be at least 6 characters long.");
+        return;
+    } else if (newPassword.length != 0){
         updatePassword(user, newPassword).then(() => {
-            console.log("Password updated successfully.");
-        })
+          console.log("Password updated successfully.");
+      })
     }
 
     const userRef = doc(db, "users", email);
@@ -70,9 +77,13 @@ export const SettingsPage = () => {
         })
         .catch((error) => {
             console.error("Error updating document: ", error);
+            alert("Error updating document");
+            return;
         });
 
     alert("Changes saved successfully!");
+    setConfirmPassword("");
+    setNewPassword("");
   };
 
   const getUserDetail = () => {
@@ -129,7 +140,8 @@ export const SettingsPage = () => {
           <div>
             <label
               htmlFor="profile-picture-upload"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700"
+              className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md ml-2 hover:bg-blue-700 text-center"
+              style={{ minWidth: "150px" }} // Optional: Set a minimum width for consistency
             >
               Upload New Picture
             </label>
@@ -141,7 +153,8 @@ export const SettingsPage = () => {
             />
             {profilePicture && (
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded-md ml-2 hover:bg-red-700"
+                className="inline-block px-4 py-2 bg-red-600 text-white rounded-md ml-2 hover:bg-red-700 text-center"
+                style={{ minWidth: "150px" }} // Match the width with the "Upload" button
                 onClick={handleRemoveProfilePicture}
               >
                 Remove Picture
