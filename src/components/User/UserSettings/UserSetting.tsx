@@ -20,12 +20,29 @@ export const SettingsPage = () => {
   const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setProfilePicture(URL.createObjectURL(file));
+      //setProfilePicture(URL.createObjectURL(file));
+      const reader = new FileReader();
+
+      reader.onload = async () => {
+        const base64String = reader.result as string;
+  
+        // Save the base64 string to Firestore
+        const userRef = doc(db, "users", email);
+        await updateDoc(userRef, { profilePicture: base64String });
+  
+        setProfilePicture(base64String); // Update state to reflect the uploaded image
+        console.log("Profile picture uploaded successfully.");
+      };
+  
+      reader.readAsDataURL(file); // Convert the file to a base64 string
     }
   };
 
-  const handleRemoveProfilePicture = () => {
-    setProfilePicture(null);
+  const handleRemoveProfilePicture = async () => {
+    setProfilePicture("/img/default_profile_image.png");
+    const userRef = doc(db, "users", email);
+    await updateDoc(userRef, { profilePicture: null });
+    console.log("Profile picture removed successfully.");
   };
 
   const handleSaveChanges = () => {
@@ -65,7 +82,16 @@ export const SettingsPage = () => {
         setEmail(userData.email);
         setPhoneNumber(userData.phone);
         setFirstName(userData.firstName);
-        setLastName(userData.lastName);
+        setLastName(userData.lastName);      
+        if (userData.profilePicture) {
+          setProfilePicture(userData.profilePicture);
+        } else {
+          // Set default profile image if no profile picture exists
+          setProfilePicture("/img/default_profile_image.png");
+        }
+      } else {
+        console.error("No such document!");
+        setProfilePicture("/img/default_profile_image.png"); // Default profile image for new users
       }
     });
   };
