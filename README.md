@@ -3,7 +3,7 @@
 ## Overview
 This project is a web-based Minimart and Voucher System. It helps users enabling users to request products and earn vouchers while providing administrators with robust management and reporting tools.
 
-##Try it out yourself!
+## Try it out yourself!
 https://snowball-nu.vercel.app/
 
 ## Built With
