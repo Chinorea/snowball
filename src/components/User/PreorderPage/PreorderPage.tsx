@@ -108,38 +108,52 @@ export const PreorderPage = () => {
       alert("User not logged in.");
       return;
     }
-
+  
     if (!productDetails.productName.trim()) {
       alert("Product name is not set.");
       return;
     }
-
+  
     if (productDetails.quantity <= 0) {
       alert("Please enter a valid quantity.");
       return;
     }
-
+  
     try {
       const userDocRef = doc(db, "users", currentUserEmail);
-
+  
       if (userPoints < productDetails.totalPoints) {
         alert("You do not have enough points to place this preorder.");
         return;
       }
-
+  
+      // Add preorder to the Preorders collection
       const preordersRef = collection(db, "users", currentUserEmail, "Preorders");
       await addDoc(preordersRef, {
         productName: productDetails.productName,
         quantity: productDetails.quantity,
         totalPoints: productDetails.totalPoints,
-        status: "Pending", // Set default status to rejected
+        status: "Pending",
       });
-
+  
+      // Update user points
       const newRemainingPoints = userPoints - productDetails.totalPoints;
       await updateDoc(userDocRef, {
         points: newRemainingPoints,
       });
-
+  
+      // Add transaction to the Transactions collection
+      const transactionsRef = collection(db, "users", currentUserEmail, "transactions");
+      await addDoc(transactionsRef, {
+        productId: "N/A", // Replace with product ID if available
+        productName: productDetails.productName,
+        pointsSpent: productDetails.totalPoints,
+        userTransactionType: "Preorder",
+        voucherUsed: "N/A", // Replace with voucher if applicable
+        timestamp: new Date(),
+        pointFlow: "-"
+      });
+  
       setUserPoints(newRemainingPoints);
       setRemainingPoints(newRemainingPoints);
       alert("Pre-order added successfully!");
@@ -150,7 +164,7 @@ export const PreorderPage = () => {
       alert("Failed to add pre-order. Please try again.");
     }
   };
-
+  
   const handleQuantityChange = (quantity: number) => {
     if (quantity < 0) return;
     const totalPoints = quantity * productDetails.pointsPerUnit;

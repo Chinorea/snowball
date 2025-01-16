@@ -145,7 +145,7 @@ export const InventoryManagement = () => {
         <h1 className="title">Inventory Management</h1>
         <button
           className="audit-logs-button"
-          onClick={() => (window.location.href = "/Inventory/auditlogs")}
+          onClick={() => (window.location.href = "/InventoryTab/auditlogs")}
         >
           View Audit Logs
         </button>

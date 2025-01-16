@@ -11,7 +11,10 @@ interface Transaction {
   id: string;
   productId: string;
   productName: string;
+  voucherUsed: string;
+  userTransactionType: string;
   pointsSpent: number;
+  pointFlow: string; 
   timestamp: Date;
 }
 
@@ -19,13 +22,13 @@ export const TransactionHistoryPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false); // Track if component is mounted
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
 
   const fetchTransactions = async () => {
     const currentUserEmail = getCurrentUserEmail();
     const isAdmin = getIsAdmin();
-    if(isAdmin == true || currentUserEmail == ""){
+    if (isAdmin == true || currentUserEmail == "") {
       router.push("/");
     }
     setLoading(true);
@@ -39,18 +42,21 @@ export const TransactionHistoryPage = () => {
           return {
             id: doc.id,
             productId: data.productId || "Unknown Product ID",
-            productName: data.productName || "Unknown Product",
+            productName: data.productName || "",
+            voucherUsed: data.voucherUsed || "Unknown Voucher",
+            userTransactionType: data.userTransactionType || "Unknown Type",
             pointsSpent: data.pointsSpent || 0,
+            pointFlow: data.pointFlow || "+", // Default to "+" if missing
             timestamp: data.timestamp instanceof Timestamp
               ? data.timestamp.toDate()
               : data.timestamp
               ? new Date(data.timestamp)
-              : new Date(), // Handle missing or invalid timestamp
+              : new Date(),
           };
         })
         .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()); // Sort by timestamp (descending)
 
-      console.log("Fetched transactions:", fetchedTransactions); // Debug log
+      console.log("Fetched transactions:", fetchedTransactions);
       setTransactions(fetchedTransactions);
     } catch (err) {
       console.error("Error fetching transactions:", err);
@@ -61,12 +67,12 @@ export const TransactionHistoryPage = () => {
   };
 
   useEffect(() => {
-    setIsMounted(true); // Set to true once component is mounted
+    setIsMounted(true);
     fetchTransactions();
   }, []);
 
   if (!isMounted) {
-    return null; // Avoid rendering while the component is mounting
+    return null;
   }
 
   if (loading) {
@@ -80,27 +86,39 @@ export const TransactionHistoryPage = () => {
   return (
     <div className="transaction-history-container">
       <div className="header-container">
-      <h1>Transaction History</h1>
-      <div className="go-back-container">
-        <button className="go-back-button" onClick={() => router.push("/Product")}>Go Back</button>
-      </div>
+        <h1>Transaction History</h1>
+        <div className="go-back-container">
+          <button className="go-back-button" onClick={() => router.push("/Product")}>
+            Go Back
+          </button>
+        </div>
       </div>
   
       {transactions.length > 0 ? (
         <table>
           <thead>
             <tr>
-              <th>Product</th>
-              <th>Points Spent</th>
               <th>Timestamp</th>
+              <th>Transaction Type</th>
+              <th>Product</th>
+              <th>Points</th>
             </tr>
           </thead>
           <tbody>
             {transactions.map((transaction) => (
               <tr key={transaction.id}>
-                <td>{transaction.productName}</td>
-                <td>{transaction.pointsSpent}</td>
                 <td>{transaction.timestamp.toLocaleString()}</td>
+                <td>{transaction.userTransactionType}</td>
+                <td>{transaction.productName}</td>
+                <td
+                  style={{
+                    color: transaction.pointFlow === "+" ? "green" : "red",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {transaction.pointFlow}
+                  {transaction.pointsSpent}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -109,5 +127,5 @@ export const TransactionHistoryPage = () => {
         <p>No transactions found.</p>
       )}
     </div>
-  );  
+  );
 };

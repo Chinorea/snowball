@@ -162,6 +162,8 @@ export const Carting = () => {
               pointsSpent: item.pointsRequired * item.quantity,
               timestamp: new Date().toISOString(),
               voucherUsed: selectedVoucher ? selectedVoucher.VoucherID : null,
+              userTransactionType: "Purchase",
+              pointFlow: "-"
             });
           } else {
             alert(`Not enough stock for ${item.name}`);

@@ -7,7 +7,8 @@ import {
   setDoc,
   doc,
   updateDoc,
-  getDoc
+  getDoc,
+  addDoc
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
@@ -19,7 +20,7 @@ interface User {
   id: string;
   username: string;
   email: string;
-  phone: string; // Add phone field
+  phone: string;
   points: number;
   status: string;
   usertype: string;
@@ -29,18 +30,18 @@ export const UserManagementPage = () => {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
-    phone: "", // Initialize phone field
+    phone: "",
     points: 0,
   });
-  const [userType, setUserType] = useState("user"); // Default to "user"
+  const [userType, setUserType] = useState("user");
   const [users, setUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState(""); // Search term state
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   // Fetch users from Firestore
   const fetchUsers = async () => {
-    //Check for user type
-    if(getCurrentUserEmail() == "" || getIsAdmin() == false){
+    if (getCurrentUserEmail() === "" || getIsAdmin() === false) {
       router.push("/");
     }
     setLoading(true);
@@ -82,7 +83,7 @@ export const UserManagementPage = () => {
             setDoc(newUserRef, {
               username: newUser.username,
               email: newUser.email,
-              phone: newUser.phone, // Add phone field here
+              phone: newUser.phone,
               points: newUser.points,
               status: "Active",
               usertype: usertype,
@@ -95,7 +96,7 @@ export const UserManagementPage = () => {
         alert(err);
       }
 
-      setNewUser({ username: "", email: "", phone: "", points: 0 }); // Reset phone field
+      setNewUser({ username: "", email: "", phone: "", points: 0 });
       setUserType("user");
       fetchUsers();
       alert("User added successfully!");
@@ -139,7 +140,7 @@ export const UserManagementPage = () => {
         return;
       }
 
-      const updatedPassword = {password: newPassword }
+      const updatedPassword = { password: newPassword };
 
       const userRef = doc(db, "users", userId);
       const docSnap = await getDoc(userRef);
@@ -147,10 +148,8 @@ export const UserManagementPage = () => {
       if (docSnap.exists()) {
         const targetAuthUID = docSnap.data().uid;
 
-        //Calls API to reset password of account.
+        // Calls API to reset password of account.
         try {
-          console.log(targetAuthUID);
-          console.log(updatedPassword);
           const response = await fetch('https://snowball-nu.vercel.app/api/updateUser', {
             method: 'POST',
             headers: {
@@ -158,13 +157,12 @@ export const UserManagementPage = () => {
             },
             body: JSON.stringify({
               uid: targetAuthUID,
-              updateData: updatedPassword, // This should be the update payload
+              updateData: updatedPassword,
             }),
           });
-      
+
           const result = await response.json();
           alert("Password reset successfully.");
-          console.log('User update result:', result);
         } catch (error) {
           console.error('Error updating user:', error);
           alert("Error updating User.");
@@ -181,7 +179,7 @@ export const UserManagementPage = () => {
     }
   };
 
-  // Edit Points
+  // Edit Points and Record Transaction
   const editUserPoints = async (userId: string, currentPoints: number) => {
     try {
       const newPoints = prompt(
@@ -201,11 +199,22 @@ export const UserManagementPage = () => {
       }
 
       const userRef = doc(db, "users", userId);
+      const transactionRef = collection(db, "users", userId, "transactions");
 
+      // Update user's points
       await updateDoc(userRef, { points: parsedPoints });
 
+      // Record the transaction
+      await addDoc(transactionRef, {
+        pointsSpent: Math.abs(parsedPoints - currentPoints),
+        timestamp: new Date(),
+        userTransactionType: "Admin Update",
+        userId: userId,
+        pointFlow: parsedPoints - currentPoints > 0 ? "+" : "-"
+      });
+
       fetchUsers();
-      alert("Points updated successfully.");
+      alert("Points updated and transaction recorded successfully.");
     } catch (err) {
       console.error("Error updating points:", err);
       alert("Failed to update points. Please try again.");
@@ -215,6 +224,10 @@ export const UserManagementPage = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  const filteredUsers = users.filter(user =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
@@ -265,8 +278,17 @@ export const UserManagementPage = () => {
 
       <div className="user-list">
         <h2>Existing Users</h2>
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search by username"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
         <ul>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <li key={user.id} className="user-card">
               <div className="user-info">
                 <p><strong>Username:</strong> {user.username}</p>

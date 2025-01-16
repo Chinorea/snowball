@@ -153,7 +153,7 @@ export const ProductCardPage = () => {
           </p>
           <div className="user-info-actions">
             <button onClick={() => router.push("/TransactionHistory")}>
-              View Transaction History
+              View Point History
             </button>
             <button onClick={() => router.push("/Preorderlist")}>
               View Pre-order
