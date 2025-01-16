@@ -151,7 +151,7 @@ export const UserManagementPage = () => {
         try {
           console.log(targetAuthUID);
           console.log(updatedPassword);
-          const response = await fetch('http://localhost:3000/api/updateUser', {
+          const response = await fetch('https://snowball-nu.vercel.app/api/updateUser', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
