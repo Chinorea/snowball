@@ -163,18 +163,18 @@ export const UserManagementPage = () => {
           });
       
           const result = await response.json();
+          alert("Password reset successfully.");
           console.log('User update result:', result);
         } catch (error) {
           console.error('Error updating user:', error);
+          alert("Error updating User.");
         }
       } else {
         console.log("No such document!");
+        alert("Error retrieving User Details.");
         return;
       }
-      
 
-
-      alert("Password reset successfully.");
     } catch (err) {
       console.error("Error resetting password:", err);
       alert("Failed to reset password. Please try again.");
