@@ -1,48 +1,82 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db } from "@/firebase/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { db, auth } from "@/firebase/firebaseConfig"; // Ensure auth is imported
+import { collection, getDocs, Timestamp, query, orderBy, limit } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import "./style.css";
+import { FirebaseError } from "firebase/app";
 
 export const AuditLogsPage = () => {
   const [logs, setLogs] = useState<
-    { id: string; action: string; product: string; amount: number | null; timestamp: string }[]
+    { id: string; action: string; product: string; amount: number | string; timestamp: Date | string }[]
   >([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch all logs from Firestore
   const fetchLogs = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "InventoryAudit"));
+      const logsQuery = query(collection(db, "InventoryAudit"), orderBy("timestamp", "desc"), limit(50));
+      const querySnapshot = await getDocs(logsQuery);
+  
       const fetchedLogs = querySnapshot.docs.map((doc) => {
         const data = doc.data();
         return {
           id: doc.id,
-          action: data.action || "Unknown",
-          product: data.product || "Unknown",
-          amount: data.amount || null,
-          timestamp: data.timestamp || "Unknown",
+          action: data.action || "No action specified",
+          product: data.product || "Unnamed product",
+          amount: typeof data.amount === "number" ? data.amount : "N/A",
+          timestamp: data.timestamp instanceof Timestamp
+            ? data.timestamp.toDate()
+            : data.timestamp
+            ? new Date(data.timestamp)
+            : "Unknown", // Fallback for missing/invalid timestamps
         };
       });
-
-      // Sort logs by timestamp in descending order
-      const sortedLogs = fetchedLogs.sort(
-        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      );
-
-      setLogs(sortedLogs);
-    } catch (error) {
+  
+      setLogs(fetchedLogs);
+    } catch (error: unknown) {
       console.error("Error fetching logs:", error);
+  
+      if (error instanceof FirebaseError) {
+        if (error.code === "permission-denied") {
+          setError("You do not have permission to access these logs.");
+        } else {
+          setError("Failed to load logs. Please try again later.");
+        }
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
+  
 
-  // Load logs on component mount
   useEffect(() => {
-    fetchLogs();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchLogs();
+      } else {
+        console.warn("User is logged out");
+        setError("You must be logged in to view audit logs.");
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
+
+  if (loading) {
+    return <div>Loading logs...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
 
   return (
     <div className="audit-logs-container">
+      <h1>Audit Logs</h1>
       <table className="audit-logs-table">
         <thead>
           <tr>
@@ -58,8 +92,8 @@ export const AuditLogsPage = () => {
               <tr key={log.id}>
                 <td>{log.product}</td>
                 <td>{log.action}</td>
-                <td>{log.amount !== null ? log.amount : "-"}</td>
-                <td>{new Date(log.timestamp).toLocaleString()}</td>
+                <td>{log.amount}</td>
+                <td>{log.timestamp !== "Unknown" ? new Date(log.timestamp).toLocaleString() : "Unknown"}</td>
               </tr>
             ))
           ) : (

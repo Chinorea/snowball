@@ -11,6 +11,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import "./style.css";
+import Link from "next/link";
 
 export const InventoryManagement = () => {
   const [products, setProducts] = useState<
@@ -143,12 +144,12 @@ export const InventoryManagement = () => {
     <div className="inventory-container">
       <div className="inventory-header">
         <h1 className="title">Inventory Management</h1>
-        <button
+        <Link
           className="audit-logs-button"
-          onClick={() => (window.location.href = "/InventoryTab/auditlogs")}
+          href="/InventoryTab/auditlogs"
         >
           View Audit Logs
-        </button>
+        </Link>
       </div>
 
       {/* Add Product Form */}

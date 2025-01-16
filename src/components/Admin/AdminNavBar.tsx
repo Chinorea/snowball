@@ -33,7 +33,7 @@ export const AdminNavbar = () => {
               width={300}
               height={200}
               alt="Logo"
-              className="w-auto h-auto"
+              className="w-auto h-auto" 
             />
           </div>
         </Link>

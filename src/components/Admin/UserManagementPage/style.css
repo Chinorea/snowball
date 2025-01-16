@@ -175,3 +175,214 @@ button:disabled {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+
+/* General Styles */
+.report-button {
+  background-color: #007bff; /* Primary Blue */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.report-button:hover {
+  background-color: #0056b3; /* Darker Blue */
+}
+
+.report-button:active {
+  background-color: #003f7f; /* Even Darker Blue */
+}
+
+/* Popup Container */
+.popup-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Popup Box */
+.popup {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Popup Heading */
+.popup h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Popup Buttons */
+.popup-option-button {
+  background-color: #28a745; /* Green */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  margin: 10px 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.popup-option-button:hover {
+  background-color: #218838; /* Darker Green */
+}
+
+.popup-option-button:active {
+  background-color: #1e7e34; /* Even Darker Green */
+}
+
+.popup-cancel-button {
+  background-color: #a72828; /* Green */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  margin: 10px 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.popup-cancel-button:hover {
+  background-color: #c82333; /* Darker Red */
+}
+
+.popup-cancel-button:active {
+  background-color: #a71d2a; /* Even Darker Red */
+}
+
+.header {
+  display: flex; /* Use flexbox to align items horizontally */
+  justify-content: space-between; /* Space out elements */
+  align-items: center; /* Align items vertically in the center */
+  margin-bottom: 20px; /* Add some spacing below the header */
+}
+
+.header h1 {
+  margin: 0; /* Remove any default margin from the title */
+  font-size: 24px; /* Adjust the font size if necessary */
+  font-weight: bold;
+  color: #333;
+}
+
+.weekly-requests-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.weekly-requests-container h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.weekly-requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.weekly-requests-table th,
+.weekly-requests-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.weekly-requests-table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+.weekly-requests-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.weekly-requests-table tr:hover {
+  background-color: #ddd;
+}
+
+.weekly-requests-table td {
+  font-size: 14px;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.inventory-summary-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-summary-container h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.inventory-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.inventory-summary-table th,
+.inventory-summary-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.inventory-summary-table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+.inventory-summary-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.inventory-summary-table tr:hover {
+  background-color: #ddd;
+}
+
+.inventory-summary-table td {
+  font-size: 14px;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}

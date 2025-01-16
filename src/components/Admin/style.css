@@ -1,11 +1,15 @@
 .admindropdownbutton {
-    all: unset; /* Resets all default browser styles */
-    cursor: pointer; /* Ensures the pointer cursor on hover */
-    font-size: 1rem; /* Adjust font size */
-    padding: 0.5rem 1rem; /* Add some padding for better appearance */
-    color: #374151; /* Default text color (gray-800 in Tailwind) */
-    transition: color 0.3s ease; /* Smooth transition for hover effect */
-  }
+  all: unset; /* Resets all default browser styles */
+  cursor: pointer; /* Ensures the pointer cursor on hover */
+  font-size: 1rem; /* Adjust font size */
+  padding: 0.5rem 1rem; /* Add some padding for better appearance */
+  color: #374151; /* Default text color (gray-800 in Tailwind) */
+  z-index: 1000;
+  position: relative; /* Ensure the dropdown remains positioned correctly */
+  white-space: nowrap; /* Prevents line breaks */
+  word-wrap: normal; /* Ensures words don’t wrap unnecessarily */
+  transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
 
   button {
     all: unset; /* Remove all inherited or default styles */

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { db } from "@/firebase/firebaseConfig"; // Adjust the path to your Firebase config
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import "./style.css"; // Import the CSS file
+import { Timestamp } from "firebase-admin/firestore";
 
 export const UserRequestProduct = () => {
   const [productName, setProductName] = useState("");
@@ -42,6 +43,7 @@ export const UserRequestProduct = () => {
       await addDoc(collection(db, "Requested Product"), {
         Name: productName,
         Amount: productQuantity,
+        timestamp: new Date(),
       });
 
       setProductName("");

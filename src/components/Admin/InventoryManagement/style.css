@@ -9,13 +9,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
-  /* Titles */
-  .title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-  }
   
   /* Add Product Form */
   .add-product-form {
@@ -202,16 +195,26 @@
   
   .inventory-header {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: left;
     position: relative;
     margin-bottom: 20px;
   }
+
   
-  .title {
-    margin: 0; /* Ensures no unnecessary space */
+   /* Titles */
+   .title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align:left;
+    z-index: 1;
   }
-  
+
+  .inventory-header .title {
+    z-index: 1; /* Lower z-index to allow dropdown to overlay */
+
+  }
+
   .audit-logs-button {
     position: absolute;
     right: 0px; /* Adjust to set the distance from the right edge */

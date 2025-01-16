@@ -8,13 +8,14 @@ import {
   doc,
   updateDoc,
   getDoc,
-  addDoc
+  addDoc,
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "@/firebase/firebaseConfig"; // Ensure your Firebase configuration is set up
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import "./style.css"; // Include the CSS file
 import { getCurrentUserEmail, getIsAdmin } from "@/components/User/userInfo";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -37,6 +38,7 @@ export const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
   const [loading, setLoading] = useState(true);
+  const [reportPopupVisible, setReportPopupVisible] = useState(false); // Popup visibility state
   const router = useRouter();
 
   // Fetch users from Firestore
@@ -87,7 +89,7 @@ export const UserManagementPage = () => {
               points: newUser.points,
               status: "Active",
               usertype: usertype,
-              uid: authUid
+              uid: authUid,
             });
           }
         );
@@ -115,123 +117,52 @@ export const UserManagementPage = () => {
     }
   };
 
-  // Suspend or Activate user
-  const toggleUserStatus = async (userId: string, currentStatus: string) => {
-    try {
-      const userRef = doc(db, "users", userId);
-      const newStatus = currentStatus === "Active" ? "Suspended" : "Active";
-
-      await updateDoc(userRef, { status: newStatus });
-      fetchUsers();
-      alert(`User ${newStatus.toLowerCase()} successfully.`);
-    } catch (err) {
-      console.error("Error updating user status:", err);
-      alert("Failed to update user status. Please try again.");
-    }
+  const openReportPopup = () => {
+    setReportPopupVisible(true);
   };
 
-  // Reset Password
-  const resetPassword = async (userId: string) => {
-    try {
-      const newPassword = prompt("Enter the new password:");
-
-      if (!newPassword || newPassword.trim() === "") {
-        alert("Password reset canceled or invalid input provided.");
-        return;
-      }
-
-      const updatedPassword = { password: newPassword };
-
-      const userRef = doc(db, "users", userId);
-      const docSnap = await getDoc(userRef);
-
-      if (docSnap.exists()) {
-        const targetAuthUID = docSnap.data().uid;
-
-        // Calls API to reset password of account.
-        try {
-          const response = await fetch('https://snowball-nu.vercel.app/api/updateUser', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              uid: targetAuthUID,
-              updateData: updatedPassword,
-            }),
-          });
-
-          const result = await response.json();
-          alert("Password reset successfully.");
-        } catch (error) {
-          console.error('Error updating user:', error);
-          alert("Error updating User.");
-        }
-      } else {
-        console.log("No such document!");
-        alert("Error retrieving User Details.");
-        return;
-      }
-
-    } catch (err) {
-      console.error("Error resetting password:", err);
-      alert("Failed to reset password. Please try again.");
-    }
-  };
-
-  // Edit Points and Record Transaction
-  const editUserPoints = async (userId: string, currentPoints: number) => {
-    try {
-      const newPoints = prompt(
-        `Enter new points for the user (current points: ${currentPoints}):`
-      );
-
-      if (newPoints === null || newPoints.trim() === "") {
-        alert("Points update canceled or invalid input provided.");
-        return;
-      }
-
-      const parsedPoints = parseInt(newPoints.trim(), 10);
-
-      if (isNaN(parsedPoints) || parsedPoints < 0) {
-        alert("Please enter a valid positive number for points.");
-        return;
-      }
-
-      const userRef = doc(db, "users", userId);
-      const transactionRef = collection(db, "users", userId, "transactions");
-
-      // Update user's points
-      await updateDoc(userRef, { points: parsedPoints });
-
-      // Record the transaction
-      await addDoc(transactionRef, {
-        pointsSpent: Math.abs(parsedPoints - currentPoints),
-        timestamp: new Date(),
-        userTransactionType: "Admin Update",
-        userId: userId,
-        pointFlow: parsedPoints - currentPoints > 0 ? "+" : "-"
-      });
-
-      fetchUsers();
-      alert("Points updated and transaction recorded successfully.");
-    } catch (err) {
-      console.error("Error updating points:", err);
-      alert("Failed to update points. Please try again.");
-    }
+  const closeReportPopup = () => {
+    setReportPopupVisible(false);
   };
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  const filteredUsers = users.filter(user =>
+  const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div>
-      <h1>User Management</h1>
+      <div className="header">
+        <h1>User Management</h1>
+        <Link className="report-button" onClick={openReportPopup} href={""}>
+          Generate Reports
+        </Link>
+      </div>
+
+      {/* Popup for report selection */}
+      {reportPopupVisible && (
+        <div className="popup-container">
+          <div className="popup">
+            <h3>Select Report Type</h3>
+            <Link
+              className="popup-option-button"
+              href={"/Dashboard/WeeklyReq"}>
+              Weekly Requests Report
+            </Link>
+            <Link
+              className="popup-option-button"
+              href={"/Dashboard/InventorySummary"}            >
+              Inventory Summary Report
+            </Link>
+            <Link className="popup-cancel-button" onClick={closeReportPopup} href={""}>
+              Cancel
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="user-form">
         <input
@@ -278,45 +209,37 @@ export const UserManagementPage = () => {
 
       <div className="user-list">
         <h2>Existing Users</h2>
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search by username"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search by username"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
         <ul>
           {filteredUsers.map((user) => (
             <li key={user.id} className="user-card">
               <div className="user-info">
-                <p><strong>Username:</strong> {user.username}</p>
-                <p><strong>Email:</strong> {user.email}</p>
-                <p><strong>Phone:</strong> {user.phone}</p>
-                <p><strong>Points:</strong> {user.points}</p>
-                <p><strong>Status:</strong> {user.status}</p>
-                <p><strong>Usertype:</strong> {user.usertype}</p>
-              </div>
-              <div className="user-actions">
-                <button
-                  className={user.status === "Active" ? "suspend-button" : "activate-button"}
-                  onClick={() => toggleUserStatus(user.id, user.status)}
-                >
-                  {user.status === "Active" ? "Suspend" : "Activate"}
-                </button>
-                <button
-                  className="edit-points-button"
-                  onClick={() => editUserPoints(user.id, user.points)}
-                >
-                  Edit Points
-                </button>
-                <button
-                  className="reset-password-button"
-                  onClick={() => resetPassword(user.id)}
-                >
-                  Reset Password
-                </button>
+                <p>
+                  <strong>Username:</strong> {user.username}
+                </p>
+                <p>
+                  <strong>Email:</strong> {user.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {user.phone}
+                </p>
+                <p>
+                  <strong>Points:</strong> {user.points}
+                </p>
+                <p>
+                  <strong>Status:</strong> {user.status}
+                </p>
+                <p>
+                  <strong>Usertype:</strong> {user.usertype}
+                </p>
               </div>
             </li>
           ))}
