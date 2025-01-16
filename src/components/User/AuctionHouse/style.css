@@ -28,8 +28,9 @@
 .my-bids-grid,
 .active-auctions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Set a minimum and maximum size for each card */
   gap: 20px;
+  justify-items: center; /* Centers the cards horizontally */
 }
 
 /* Auction Item Card Styling */
@@ -39,8 +40,11 @@
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 300px; /* Fixed width */
+  height: 400px; /* Fixed height */
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-between;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -50,17 +54,27 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.auction-item-card img.auction-item-image {
+  width: 100%; /* Ensures the image fills the card width */
+  height: 200px; /* Ensures the image height is fixed */
+  object-fit: cover; /* Ensures the image is cropped proportionally */
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
 .auction-item-card h3 {
   font-size: 18px;
   font-weight: bold;
   color: #333333;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .auction-item-card p {
   font-size: 14px;
   color: #666666;
   margin: 5px 0;
+  text-align: center;
 }
 
 .auction-item-card .bid-button {
@@ -90,6 +104,7 @@
   font-size: 18px;
   margin: 0;
 }
+
 
 .user-info-actions button {
   padding: 8px 16px;

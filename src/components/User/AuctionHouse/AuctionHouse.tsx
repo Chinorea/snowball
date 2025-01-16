@@ -1,11 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, doc, getDocs, query, where, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
-import { getCurrentUserEmail, setCurrentUserEmail } from "../userInfo";
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  where,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { db } from "@/firebase/firebaseConfig"; // Ensure storage is imported
+import { getCurrentUserEmail } from "../userInfo";
 import "./style.css";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 interface AuctionItem {
   id: string;
@@ -15,6 +24,7 @@ interface AuctionItem {
   currentBidder: string;
   auctionFinishDate: string;
   completedBid: boolean;
+  imageUrl?: string; // Add imageUrl for storing image reference
 }
 
 export const AuctionHouse = () => {
@@ -24,6 +34,7 @@ export const AuctionHouse = () => {
   const [userPoints, setUserPoints] = useState<number>(0);
   const userId = getCurrentUserEmail();
   const router = useRouter();
+  const storage = getStorage();
 
   useEffect(() => {
     fetchUserPoints();
@@ -49,55 +60,67 @@ export const AuctionHouse = () => {
       const auctionRef = collection(db, "auction");
       const q = query(auctionRef, where("completedBid", "==", false));
       const auctionSnapshot = await getDocs(q);
-      const fetchedAuctionListings = auctionSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as AuctionItem[];
 
-      setAuctionListings(fetchedAuctionListings);
+      const fetchedAuctionListings = await Promise.all(
+        auctionSnapshot.docs.map(async (doc) => {
+          const data = doc.data();
+          const imageUrl = await fetchImage(data.title); // Fetch image URL
+          return {
+            id: doc.id,
+            ...data,
+            imageUrl,
+          } as AuctionItem;
+        })
+      );
+
+      // Filter out auctions where the current user is already the bidder
+      const filteredAuctionListings = fetchedAuctionListings.filter(
+        (item) => item.currentBidder !== userId
+      );
+
+      setAuctionListings(filteredAuctionListings);
     } catch (err) {
       console.error("Error fetching auction listings:", err);
       setError("Failed to fetch auction listings. Please try again later.");
     }
   };
 
-const fetchMyBids = async () => {
-  try {
-    const auctionRef = collection(db, "auction");
-    const q = query(auctionRef, where("currentBidder", "==", userId));
-    const myBidsSnapshot = await getDocs(q);
-    const fetchedMyBids = myBidsSnapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as AuctionItem[];
-
-    // Filter out completed bids
-    setMyBids(fetchedMyBids.filter((item) => !item.completedBid));
-  } catch (err) {
-    console.error("Error fetching my bids:", err);
-    setError("Failed to fetch your bids. Please try again later.");
-  }
-};
-
-  const handlePointReturn = async (email: string, bid: number) => {
-    const userRef = doc(db, "users", email);
-
+  const fetchMyBids = async () => {
     try {
-      // Fetch current user data
-      const userSnapshot = await getDoc(userRef);
-      if (!userSnapshot.exists()) {
-        throw new Error("User does not exist.");
-      }
-      const userData = userSnapshot.data();
-      const currentPoints = userData.points;
+      const auctionRef = collection(db, "auction");
+      const q = query(
+        auctionRef,
+        where("currentBidder", "==", userId),
+        where("completedBid", "==", false) // Filter for only incomplete bids
+      );
+      const myBidsSnapshot = await getDocs(q);
 
-      await updateDoc(userRef, {
-        points: currentPoints + bid,
-      });
-    } catch (error) {
-      console.error("Error updating prev bidder:", error);
-      alert("Error Updating prev Bidder. Please try again.");
+      const fetchedMyBids = await Promise.all(
+        myBidsSnapshot.docs.map(async (doc) => {
+          const data = doc.data();
+          const imageUrl = await fetchImage(data.title); // Fetch image URL
+          return {
+            id: doc.id,
+            ...data,
+            imageUrl,
+          } as AuctionItem;
+        })
+      );
+
+      setMyBids(fetchedMyBids.filter((item) => !item.completedBid));
+    } catch (err) {
+      console.error("Error fetching my bids:", err);
+      setError("Failed to fetch your bids. Please try again later.");
+    }
+  };
+
+  const fetchImage = async (title: string): Promise<string | undefined> => {
+    try {
+      const storageRef = ref(storage, `auctionImages/${title}/image.jpg`); // Update path accordingly
+      return await getDownloadURL(storageRef);
+    } catch (err) {
+      console.error(`Error fetching image for ${title}:`, err);
+      return "/default-placeholder.png"; // Fallback placeholder image
     }
   };
 
@@ -108,7 +131,6 @@ const fetchMyBids = async () => {
     const prevBid = item.currentBid;
 
     try {
-      // Fetch current user data
       const userSnapshot = await getDoc(userRef);
       if (!userSnapshot.exists()) {
         throw new Error("User does not exist.");
@@ -117,7 +139,6 @@ const fetchMyBids = async () => {
       const userData = userSnapshot.data();
       const currentPoints = userData.points;
 
-      // Prompt for new bid amount
       const newBidInput = prompt("Enter your Bid:");
       const newBid = newBidInput ? parseFloat(newBidInput) : NaN;
       if (isNaN(newBid) || newBid <= item.currentBid) {
@@ -130,24 +151,21 @@ const fetchMyBids = async () => {
         return;
       }
 
-      // Update auction item with new bid and bidder
       const auctionItemRef = doc(db, "auction", item.id);
       await updateDoc(auctionItemRef, {
         currentBid: newBid,
         currentBidder: email,
       });
 
-      // Lock points from user
       await updateDoc(userRef, {
         points: currentPoints - newBid,
       });
 
-      // Return Locked Points from previous user
-      handlePointReturn(prevBidder, prevBid);
+      if (prevBidder) {
+        await handlePointReturn(prevBidder, prevBid);
+      }
 
       alert("Your bid was placed successfully.");
-
-      // Update page
       fetchAuctionListings();
       fetchMyBids();
     } catch (error) {
@@ -156,36 +174,46 @@ const fetchMyBids = async () => {
     }
   };
 
+  const handlePointReturn = async (email: string, bid: number) => {
+    const userRef = doc(db, "users", email);
+
+    try {
+      const userSnapshot = await getDoc(userRef);
+      if (!userSnapshot.exists()) {
+        throw new Error("User does not exist.");
+      }
+      const userData = userSnapshot.data();
+      const currentPoints = userData.points;
+
+      await updateDoc(userRef, {
+        points: currentPoints + bid,
+      });
+    } catch (error) {
+      console.error("Error returning points to previous bidder:", error);
+    }
+  };
+
   return (
     <div className="auction-house-container">
-      {/* User Points Display */}
       <div className="user-points-section">
         <p>Your Points: {userPoints}</p>
         <div className="user-info-actions">
           <button onClick={() => router.push("/AuctionHouseHistory")}>
-              View Completed Auction History
-          </button>          
+            View Completed Auction History
+          </button>
         </div>
       </div>
 
-      {/* Segment 1: Items You Have Bidded On */}
       <div className="my-bids-section">
         <h2>Items You Have Bidded On</h2>
         {myBids.length > 0 ? (
           <div className="my-bids-grid">
             {myBids.map((item) => (
               <div key={item.id} className="auction-item-card">
+                <img src={item.imageUrl || "/placeholder.png"} alt={item.title} className="auction-item-image" />
                 <h3>{item.title}</h3>
                 <p>{item.details}</p>
-                <p>
-                  <strong>Current Bid:</strong> {item.currentBid}
-                </p>
-                <p>
-                  <strong>Current Bidder:</strong> {item.currentBidder}
-                </p>
-                <p>
-                  <strong>Status:</strong> {item.completedBid ? "Completed" : "Ongoing"}
-                </p>
+                <p><strong>Current Bid:</strong> {item.currentBid}</p>
               </div>
             ))}
           </div>
@@ -194,26 +222,17 @@ const fetchMyBids = async () => {
         )}
       </div>
 
-      {/* Segment 2: Active Items Available for Bidding */}
       <div className="active-auctions-section">
         <h2>Auction House</h2>
         {auctionListings.length > 0 ? (
           <div className="active-auctions-grid">
-            {auctionListings
-            .slice(-15)
-            .map((item) => (
+            {auctionListings.map((item) => (
               <div key={item.id} className="auction-item-card">
+                <img src={item.imageUrl || "/placeholder.png"} alt={item.title} className="auction-item-image" />
                 <h3>{item.title}</h3>
                 <p>{item.details}</p>
-                <p>
-                  <strong>Current Bid:</strong> {item.currentBid}
-                </p>
-                <p>
-                  <strong>Current Bidder:</strong> {item.currentBidder || "None"}
-                </p>
-                <button className="bid-button" onClick={() => handleBid(item)}>
-                  Place a Bid
-                </button>
+                <p><strong>Current Bid:</strong> {item.currentBid}</p>
+                <button onClick={() => handleBid(item)}>Place a Bid</button>
               </div>
             ))}
           </div>
@@ -224,4 +243,3 @@ const fetchMyBids = async () => {
     </div>
   );
 };
-

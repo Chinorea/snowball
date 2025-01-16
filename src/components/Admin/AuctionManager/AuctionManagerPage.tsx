@@ -11,6 +11,7 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db } from "@/firebase/firebaseConfig";
 import "./style.css";
 
@@ -22,16 +23,20 @@ interface AuctionItem {
   currentBidder: string;
   auctionFinishDate: string;
   completedBid: boolean;
+  imageUrl?: string; // Add imageUrl field
 }
 
 export const AuctionManagerPage = () => {
   const [auctionItems, setAuctionItems] = useState<AuctionItem[]>([]);
-  const [newAuctionItem, setNewAuctionItem] = useState<Omit<AuctionItem, "id" | "currentBidder" | "completedBid">>({
+  const [newAuctionItem, setNewAuctionItem] = useState<
+    Omit<AuctionItem, "id" | "currentBidder" | "completedBid" | "imageUrl">
+  >({
     title: "",
     details: "",
     auctionFinishDate: "",
     currentBid: 0,
   });
+  const [imageFile, setImageFile] = useState<File | null>(null); // For image upload
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateAuctionModal, setShowCreateAuctionModal] = useState(false);
@@ -56,6 +61,7 @@ export const AuctionManagerPage = () => {
       setLoading(false);
     }
   };
+
 
   const closeBid = async (item: AuctionItem) => {
     const auctionItemRef = doc(db, "auction", item.id);
@@ -82,7 +88,6 @@ export const AuctionManagerPage = () => {
     }
   };
 
-
   const createCompletedBid = async (item: AuctionItem, user: string, timestamp: string) => {
     const userDocRef = doc(db, "users", user);
     const auctionRef = collection(userDocRef, "auctions");
@@ -95,6 +100,22 @@ export const AuctionManagerPage = () => {
     })
   }
 
+
+  const uploadImageToStorage = async (title: string) => {
+    if (!imageFile) return "";
+
+    try {
+      const storage = getStorage();
+      const storageRef = ref(storage, `auctionImages/${title}/image.jpg`);
+      await uploadBytes(storageRef, imageFile);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw new Error("Failed to upload image.");
+    }
+  };
+
   const handleCreateAuction = async () => {
     if (!newAuctionItem.title.trim() || !newAuctionItem.details.trim() || !newAuctionItem.auctionFinishDate.trim()) {
       alert("Please fill in all required fields.");
@@ -102,6 +123,8 @@ export const AuctionManagerPage = () => {
     }
 
     try {
+      const imageUrl = await uploadImageToStorage(newAuctionItem.title);
+
       const auctionCollectionRef = collection(db, "auction");
       await addDoc(auctionCollectionRef, {
         title: newAuctionItem.title,
@@ -110,6 +133,7 @@ export const AuctionManagerPage = () => {
         currentBid: newAuctionItem.currentBid,
         currentBidder: "",
         completedBid: false,
+        imageUrl,
       });
 
       alert("Auction created successfully!");
@@ -119,6 +143,7 @@ export const AuctionManagerPage = () => {
         auctionFinishDate: "",
         currentBid: 0,
       });
+      setImageFile(null); // Reset image input
       setShowCreateAuctionModal(false);
       fetchAuctionItems();
     } catch (err) {
@@ -147,6 +172,7 @@ export const AuctionManagerPage = () => {
               <th>Current Bid</th>
               <th>Current Bidder</th>
               <th>Auction Finish Date</th>
+              <th>Image</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -160,6 +186,11 @@ export const AuctionManagerPage = () => {
                   <td>{item.currentBid}</td>
                   <td>{item.currentBidder || "No bids yet"}</td>
                   <td>{item.auctionFinishDate}</td>
+                  <td>
+                    {item.imageUrl && (
+                      <img src={item.imageUrl} alt={item.title} style={{ width: "100px" }} />
+                    )}
+                  </td>
                   <td>
                     <button
                       className="bid-button"
@@ -237,6 +268,14 @@ export const AuctionManagerPage = () => {
                 onChange={(e) =>
                   setNewAuctionItem({ ...newAuctionItem, auctionFinishDate: e.target.value })
                 }
+              />
+            </div>
+            <div>
+              <label>Upload Image:</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
               />
             </div>
             <button onClick={handleCreateAuction}>Create Auction</button>
