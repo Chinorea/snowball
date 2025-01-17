@@ -133,6 +133,110 @@ export const UserManagementPage = () => {
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Suspend or Activate user
+  const toggleUserStatus = async (userId: string, currentStatus: string) => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const newStatus = currentStatus === "Active" ? "Suspended" : "Active";
+
+      await updateDoc(userRef, { status: newStatus });
+      fetchUsers();
+      alert(`User ${newStatus.toLowerCase()} successfully.`);
+    } catch (err) {
+      alert("Failed to update user status. Please try again.");
+    }
+  }
+
+
+  // Reset Password
+  const resetPassword = async (userId: string) => {
+    try {
+      const newPassword = prompt("Enter the new password:");
+
+      if (!newPassword || newPassword.trim() === "") {
+        alert("Password reset canceled or invalid input provided.");
+        return;
+      }
+
+      const updatedPassword = { password: newPassword };
+
+      const userRef = doc(db, "users", userId);
+      const docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        const targetAuthUID = docSnap.data().uid;
+
+        // Calls API to reset password of account.
+        try {
+          const response = await fetch('https://snowball-nu.vercel.app/api/updateUser', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              uid: targetAuthUID,
+              updateData: updatedPassword,
+            }),
+          });
+
+          const result = await response.json();
+          alert("Password reset successfully.");
+        } catch (error) {
+          alert("Error updating User.");
+        }
+      } else {
+        alert("Error retrieving User Details.");
+        return;
+      }
+
+    } catch (err) {
+      alert("Failed to reset password. Please try again.");
+    }
+  };
+
+  // Edit Points and Record Transaction
+  const editUserPoints = async (userId: string, currentPoints: number) => {
+    try {
+      const newPoints = prompt(
+        `Enter new points for the user (current points: ${currentPoints}):`
+      );
+
+      if (newPoints === null || newPoints.trim() === "") {
+        alert("Points update canceled or invalid input provided.");
+        return;
+      }
+
+      const parsedPoints = parseInt(newPoints.trim(), 10);
+
+      if (isNaN(parsedPoints) || parsedPoints < 0) {
+        alert("Please enter a valid positive number for points.");
+        return;
+      }
+
+      const userRef = doc(db, "users", userId);
+      const transactionRef = collection(db, "users", userId, "transactions");
+
+      // Update user's points
+      await updateDoc(userRef, { points: parsedPoints });
+
+      // Record the transaction
+      await addDoc(transactionRef, {
+        pointsSpent: Math.abs(parsedPoints - currentPoints),
+        timestamp: new Date(),
+        userTransactionType: "Admin Update",
+        userId: userId,
+        pointFlow: parsedPoints - currentPoints > 0 ? "+" : "-"
+      });
+
+      fetchUsers();
+      alert("Points updated and transaction recorded successfully.");
+    } catch (err) {
+      console.error("Error updating points:", err);
+      alert("Failed to update points. Please try again.");
+    }
+  }
+
+
   return (
     <div>
       <div className="header">
@@ -241,6 +345,26 @@ export const UserManagementPage = () => {
                   <strong>Usertype:</strong> {user.usertype}
                 </p>
               </div>
+              <div className="user-actions">
+                <button
+                  className={user.status === "Active" ? "suspend-button" : "activate-button"}
+                  onClick={() => toggleUserStatus(user.id, user.status)}
+                >
+                  {user.status === "Active" ? "Suspend" : "Activate"}
+                </button>
+                <button
+                  className="edit-points-button"
+                  onClick={() => editUserPoints(user.id, user.points)}
+                >
+                  Edit Points
+                </button>
+                <button
+                  className="reset-password-button"
+                  onClick={() => resetPassword(user.id)}
+                >
+                  Reset Password
+                </button>
+                </div>
             </li>
           ))}
         </ul>
