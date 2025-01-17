@@ -34,7 +34,7 @@ export const UserManagementPage = () => {
     phone: "",
     points: 0,
   });
-  const [userType, setUserType] = useState("user");
+  const [userType, setUserType] = useState("User");
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
   const [loading, setLoading] = useState(true);
@@ -99,7 +99,7 @@ export const UserManagementPage = () => {
       }
 
       setNewUser({ username: "", email: "", phone: "", points: 0 });
-      setUserType("user");
+      setUserType("User");
       fetchUsers();
       alert("User added successfully!");
     } catch (err) {
@@ -358,6 +358,13 @@ export const UserManagementPage = () => {
                 >
                   Edit Points
                 </button>
+                <Link
+                  className="view-transactions-button"
+                  href={`/TransactionHistory/AdminView?userId=${user.id}`}
+                  style={{ display: user.usertype === "User" ? "inline-block" : "none" }}
+                >
+                  View Transaction History
+                </Link>
                 <button
                   className="reset-password-button"
                   onClick={() => resetPassword(user.id)}

@@ -1,0 +1,73 @@
+
+  
+  /* Search Bar */
+  .search-bar input {
+    margin-bottom: 15px;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  /* Transaction History */
+  .transaction-history-container {
+    margin: 20px auto;
+    max-width: 800px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .transaction-history-container table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .transaction-history-container th,
+  .transaction-history-container td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  
+  .transaction-history-container th {
+    background-color: #f4f4f4;
+  }
+  
+  .transaction-history-container td {
+    font-size: 14px;
+  }
+  
+  .transaction-history-container .go-back-button {
+    margin: 10px 0;
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .transaction-history-container .go-back-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .go-back-link {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .go-back-link:hover {
+    background-color: #0056b3;
+  }
+  
